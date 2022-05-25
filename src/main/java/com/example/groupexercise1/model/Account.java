@@ -3,6 +3,8 @@ package com.example.groupexercise1.model;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import javax.persistence.OneToMany;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -38,9 +41,13 @@ public abstract class Account {
 	private Double penalty;
 	private Double transactionCharge;
 	private Double interestCharge;
+
 	@JsonIgnore
 	private LocalDate createdDate;
-	
+
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "account")
+	private Set<Transaction> transactions;
+
 	public Long getId() {
 		return id;
 	}
