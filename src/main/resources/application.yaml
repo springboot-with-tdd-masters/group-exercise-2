@@ -1,0 +1,14 @@
+regular:
+  charge: 0.0
+  minimumBal: 500.0
+  penalty: 10.0
+interest:
+  charge: 0.03
+  minimumBal: 0.0
+checking:
+  minimumBal: 100.0
+  penalty: 10.0
+  transactionCharge: 1.0
+  interestCharge: 0.0
+
+
