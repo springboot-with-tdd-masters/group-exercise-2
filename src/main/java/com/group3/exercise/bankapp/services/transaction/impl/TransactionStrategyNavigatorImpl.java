@@ -39,20 +39,20 @@ public class TransactionStrategyNavigatorImpl implements TransactionStrategyNavi
     public Account generateNewAccountDetails(String name, String acctNumber, String type) {
         return Optional.ofNullable(txnTypeLookup.get(type))
                 .map(txn -> txn.generateNewAccountDetails(name, acctNumber))
-                .orElseThrow(() -> new BankAppException(BankAppExceptionCode.BAD_REQUEST));
+                .orElseThrow(() -> new BankAppException(BankAppExceptionCode.ACCOUNT_TYPE_EXCEPTION));
     }
 
     @Override
     public Account withdraw(Account account, Double amount) {
        return Optional.ofNullable(txnLookup.get(account.getClass()))
                 .map(txn -> txn.withdraw(account, amount))
-               .orElseThrow(() -> new BankAppException(BankAppExceptionCode.BAD_REQUEST));
+               .orElseThrow(() -> new BankAppException(BankAppExceptionCode.ACCOUNT_TYPE_EXCEPTION));
     }
 
     @Override
     public Account deposit(Account account, Double amount) {
         return Optional.ofNullable(txnLookup.get(account.getClass()))
                 .map(txn -> txn.deposit(account, amount))
-                .orElseThrow(() -> new BankAppException(BankAppExceptionCode.BAD_REQUEST));
+                .orElseThrow(() -> new BankAppException(BankAppExceptionCode.ACCOUNT_TYPE_EXCEPTION));
     }
 }

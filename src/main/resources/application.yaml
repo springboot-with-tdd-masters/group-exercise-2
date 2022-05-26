@@ -10,5 +10,9 @@ checking:
   penalty: 10.0
   transactionCharge: 1.0
   interestCharge: 0.0
-
+## JWT config
+jwt:
+  salt: group3-exercise
+  validity: 30000 # in millis
+  issuer: group3
 

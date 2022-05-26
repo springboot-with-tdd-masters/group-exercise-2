@@ -94,7 +94,7 @@ public class AccountControllerTest {
         CreateAccountRequest request = new CreateAccountRequest();
         request.setName("Jane Doe");
         request.setType("credit");
-        when(service.register(any(CreateAccountRequest.class))).thenThrow(new BankAppException(BankAppExceptionCode.BAD_REQUEST));
+        when(service.register(any(CreateAccountRequest.class))).thenThrow(new BankAppException(BankAppExceptionCode.ACCOUNT_TYPE_EXCEPTION));
         // when
         ResultActions result = mvc.perform(post("/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
