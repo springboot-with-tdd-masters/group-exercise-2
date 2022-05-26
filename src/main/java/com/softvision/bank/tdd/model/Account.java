@@ -7,6 +7,7 @@ import com.softvision.bank.tdd.ApplicationConstants;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -14,11 +15,13 @@ import java.time.LocalDate;
 @JsonSubTypes({ @JsonSubTypes.Type(value = RegularAccount.class, name = ApplicationConstants.REGULAR),
 		@JsonSubTypes.Type(value = CheckingAccount.class, name = ApplicationConstants.CHECKING),
 		@JsonSubTypes.Type(value = InterestAccount.class, name = ApplicationConstants.INTEREST) })
-public abstract class Account {
+public abstract class Account extends AuditModel{
+
+	private static final long serialVersionUID = 7310199969287815400L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
 
 	private String name;
 
@@ -36,6 +39,9 @@ public abstract class Account {
 
 	@JsonIgnore
 	private LocalDate createdDate;
+	
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "account")
+	private Set<Transaction> transaction;
 
 	public Account() {
 

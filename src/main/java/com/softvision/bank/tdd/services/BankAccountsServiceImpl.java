@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -37,23 +38,30 @@ public class BankAccountsServiceImpl implements BankAccountsService {
 	}
 
 	@Override
-	public Account createUpdate(Account account) {
-		account.setAcctNumber(generateRandomAcctNum());
-		if (account instanceof RegularAccount) {
-			account.setPenalty(ApplicationConstants.REG_PENALTY);
-			account.setMinimumBalance(ApplicationConstants.REG_MIN_BALANCE);
-			account.setBalance(ApplicationConstants.REG_MIN_BALANCE);
-		} else if (account instanceof CheckingAccount) {
-			account.setMinimumBalance(ApplicationConstants.CHK_MIN_BALANCE);
-			account.setTransactionCharge(ApplicationConstants.CHK_CHARGE);
-			account.setPenalty(ApplicationConstants.CHK_PENALTY);
-			account.setBalance(ApplicationConstants.CHK_MIN_BALANCE);
-		} else if (account instanceof InterestAccount) {
-			account.setInterestCharge(ApplicationConstants.INT_INTEREST);
+	public Account createUpdate(Account accountEntity) {
+		Optional<Account> account = repository.findById(accountEntity.getId());
+		
+		if(account.isPresent()) {
+			Account newAccount = account.get();
+			newAccount.setName(accountEntity.getName());
+			return repository.save(newAccount);
+		} else {
+			accountEntity.setAcctNumber(generateRandomAcctNum());
+			if (accountEntity instanceof RegularAccount) {
+				accountEntity.setPenalty(ApplicationConstants.REG_PENALTY);
+				accountEntity.setMinimumBalance(ApplicationConstants.REG_MIN_BALANCE);
+				accountEntity.setBalance(ApplicationConstants.REG_MIN_BALANCE);
+			} else if (accountEntity instanceof CheckingAccount) {
+				accountEntity.setMinimumBalance(ApplicationConstants.CHK_MIN_BALANCE);
+				accountEntity.setTransactionCharge(ApplicationConstants.CHK_CHARGE);
+				accountEntity.setPenalty(ApplicationConstants.CHK_PENALTY);
+				accountEntity.setBalance(ApplicationConstants.CHK_MIN_BALANCE);
+			} else if (accountEntity instanceof InterestAccount) {
+				accountEntity.setInterestCharge(ApplicationConstants.INT_INTEREST);
+			}
 		}
-
-		account = repository.save(account);
-		return account;
+		
+		return repository.save(accountEntity);
 	}
 
 	private static String generateRandomAcctNum() {

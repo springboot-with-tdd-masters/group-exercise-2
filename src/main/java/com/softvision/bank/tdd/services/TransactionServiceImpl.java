@@ -8,17 +8,23 @@ import com.softvision.bank.tdd.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.softvision.bank.tdd.repository.AccountRepository;
+import com.softvision.bank.tdd.repository.TransactionRepository;
 
 import static java.util.Optional.of;
+
+import java.util.List;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
 	@Autowired
 	AccountRepository accountRepository;
+	
+	@Autowired
+	TransactionRepository transactionRepository;
 
 	public Account transact(long id, Transaction transaction) {
 		Account account = accountRepository.findById(id).orElseThrow(RecordNotFoundException::new);
-		
+
 		if(transaction.getAmount() <= 0)
 			throw new BadRequestException();
 		
@@ -34,6 +40,8 @@ public class TransactionServiceImpl implements TransactionService {
 				throw new BadRequestException();
 		}
 		computeCharges(account);
+		transaction.setAccount(account);
+		transactionRepository.save(transaction);
 		return accountRepository.save(account);
 	}
 
@@ -66,5 +74,17 @@ public class TransactionServiceImpl implements TransactionService {
 
 	private static void computeTransactionCharge(Account account) {
 		account.setBalance(account.getBalance() - account.getTransactionCharge());
+	}
+
+	@Override
+	public List<Transaction> findbyAccountId(Long id) {
+		return transactionRepository.findByAccountId(id);
+	}
+
+	@Override
+	public void deleteTransactionById(Long accountId, Long transactionId) {
+		accountRepository.findById(accountId).orElseThrow(RecordNotFoundException::new);
+		transactionRepository.findById(transactionId).orElseThrow(RecordNotFoundException::new);
+		transactionRepository.deleteById(transactionId);
 	}
 }
