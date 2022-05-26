@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group3.exercise.bankapp.constants.TransactionTypes;
 import com.group3.exercise.bankapp.exceptions.BankAppException;
 import com.group3.exercise.bankapp.exceptions.BankAppExceptionCode;
+import com.group3.exercise.bankapp.exceptions.GlobalExceptionHandler;
 import com.group3.exercise.bankapp.request.TransactionRequest;
 import com.group3.exercise.bankapp.response.TransactionLogResponse;
 import com.group3.exercise.bankapp.services.transaction.TransactionLogService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,11 +20,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,14 +40,24 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @ExtendWith(MockitoExtension.class)
 public class TransactionLogControllerTest {
 
-    @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Autowired
     ObjectMapper mapper;
 
     @MockBean
     TransactionLogService transactionLogService;
+
+    private TransactionLogController controller;
+
+    @BeforeEach
+    void setup(){
+        controller = new TransactionLogController(transactionLogService);
+        this.mockMvc = MockMvcBuilders.standaloneSetup(controller)
+                .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
+    }
 
     @Test
     @DisplayName("Should return all transaction log given the account id on params")
