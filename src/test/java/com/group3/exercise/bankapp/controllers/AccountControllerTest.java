@@ -14,15 +14,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 
+import com.group3.exercise.bankapp.security.config.Group3WebSecurityConfig;
+import com.group3.exercise.bankapp.security.config.components.UserAuthenticationEntryPoint;
+import com.group3.exercise.bankapp.security.config.components.UserRequestFilter;
+import com.group3.exercise.bankapp.security.repositories.UserRepository;
+import com.group3.exercise.bankapp.security.services.MyUserDetailsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -37,7 +50,7 @@ import com.group3.exercise.bankapp.request.TransactionRequest;
 import com.group3.exercise.bankapp.response.AccountResponse;
 import com.group3.exercise.bankapp.services.account.AccountService;
 
-@WebMvcTest(controllers = AccountController.class)
+@WebMvcTest(controllers = AccountController.class, useDefaultFilters = false)
 @ExtendWith(MockitoExtension.class)
 public class AccountControllerTest {
     MockMvc mvc;
@@ -52,7 +65,9 @@ public class AccountControllerTest {
     @BeforeEach
     void setup() {
         controller = new AccountController(service);
-        mvc = MockMvcBuilders.standaloneSetup(controller).setControllerAdvice(new GlobalExceptionHandler()).build();
+        mvc = MockMvcBuilders.standaloneSetup(controller)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
     }
 
     @Test

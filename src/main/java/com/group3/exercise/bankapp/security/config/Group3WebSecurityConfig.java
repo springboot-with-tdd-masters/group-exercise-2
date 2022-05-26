@@ -31,8 +31,6 @@ public class Group3WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserRequestFilter requestFilter;
-//    @Autowired
-//    private ExceptionHandlerFilter exceptionHandlerFilter;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {

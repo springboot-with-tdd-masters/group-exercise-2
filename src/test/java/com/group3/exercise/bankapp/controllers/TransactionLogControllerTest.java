@@ -31,7 +31,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-@WebMvcTest(TransactionLogController.class)
+@WebMvcTest(controllers = TransactionLogController.class, useDefaultFilters = false)
 @ExtendWith(MockitoExtension.class)
 public class TransactionLogControllerTest {
 
