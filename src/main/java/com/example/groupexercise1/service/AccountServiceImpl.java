@@ -192,6 +192,19 @@ public class AccountServiceImpl implements AccountService {
 		}
 	}
 
+	@Override
+	public AccountDto updateAccount(AccountRequestDto accountRequest) {
+		Optional<Account> result = accountRepository.findById(accountRequest.getId());
+		if (result.isPresent()) {
+			Account account = result.get();
+			account.setName(accountRequest.getName());
+			accountRepository.save(account);
+			return new AccountDto(account);
+		} else {
+			throw new AccountNotFoundException("Account not found");
+		}
+	}
+
 	private Double getMonthlyInterest(Account account) {
 
 		Double monthlyInterest = 0d;

@@ -25,8 +25,12 @@ public class AccountController {
 
 	
 	@PostMapping
-	public AccountDto createAccount(@RequestBody AccountRequestDto account) {
-		return accountService.createAccount(account);
+	public AccountDto createOrUpdateAccount(@RequestBody AccountRequestDto account) {
+		if (account.getId() > 0){
+			return accountService.updateAccount(account);
+		}else{
+			return accountService.createAccount(account);
+		}
 	}
 	
 	@GetMapping

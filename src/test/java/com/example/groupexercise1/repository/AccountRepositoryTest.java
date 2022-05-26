@@ -98,4 +98,46 @@ public class AccountRepositoryTest {
     assertThat(updatedResponse.getUpdatedAt()).isNotNull();
 
   }
+
+  @Test
+  @DisplayName("Upon successful update of account name should return the updated value")
+  public void updateAccountChangeName() {
+    RegularAccount newAccount = new RegularAccount();
+    newAccount.setMinimumBalance(500d);
+    newAccount.setName("Juan Dela Cruz");
+
+    RegularAccount initialResponse = accountRepository.save(newAccount);
+    assertThat(initialResponse.getName()).isEqualTo(newAccount.getName());
+
+    Optional<Account> actualAccount = accountRepository.findById(initialResponse.getId());
+    RegularAccount savedAccount = (RegularAccount) actualAccount.get();
+    savedAccount.setName("John Delacroix");
+
+    RegularAccount actualResponse = accountRepository.save(savedAccount);
+
+    assertThat(actualResponse.getName()).isEqualTo("John Delacroix");
+    assertThat(actualResponse.getCreatedAt()).isNotNull();
+    assertThat(actualResponse.getUpdatedAt()).isNotNull();
+  }
+
+
+  @Test
+  @DisplayName("Delete account")
+  public void deleteAccount() {
+    RegularAccount newAccount = new RegularAccount();
+    newAccount.setMinimumBalance(500d);
+    newAccount.setName("Juan Dela Cruz");
+
+    RegularAccount initialResponse = accountRepository.save(newAccount);
+    assertThat(initialResponse.getName()).isEqualTo(newAccount.getName());
+
+    accountRepository.deleteById(initialResponse.getId());
+
+    Optional<Account> actualAccount = accountRepository.findById(initialResponse.getId());
+
+    assertThat(actualAccount.isEmpty()).isEqualTo(true);
+
+  }
+
+
 }

@@ -1,5 +1,6 @@
 package com.example.groupexercise1.service;
 
+import com.example.groupexercise1.model.Account;
 import java.util.List;
 
 import com.example.groupexercise1.model.dto.AccountDto;
@@ -11,4 +12,5 @@ public interface AccountService {
 	List<AccountDto> getAllAccounts();
 	AccountDto createTransaction(String type, long accountId, double amount);
 	void deleteAccount(long accountId);
+  AccountDto updateAccount(AccountRequestDto accountRequest);
 }

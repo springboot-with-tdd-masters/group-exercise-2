@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -541,4 +542,42 @@ public class AccountServiceTest {
 
 		assertEquals(actualResponse.getBalance(),expectedBalance);
 	}
+
+	@Test
+	@DisplayName("Should be able to update account name and return updated value")
+	public void shouldeBeAbleToUpdateAccountName() {
+		Account account = new InterestAccount();
+		account.setId(1L);
+		account.setName("Juan Dela Cruz");
+		account.setAcctNumber("123456");
+		account.setMinimumBalance(0d);
+		account.setBalance(100d);
+		account.setPenalty(0d);
+		account.setTransactionCharge(0d);
+		account.setInterestCharge(0.03d);
+		account.setCreatedDate(LocalDate.now());
+
+		when(accountRepository.findById(1L))
+				.thenReturn(Optional.of(account));
+
+		String updatedName = "John Delacroix";
+		AccountRequestDto updatePayload = new AccountRequestDto(account.getId(),updatedName, account.getType());
+
+		AccountDto actualResponse = accountService.updateAccount(updatePayload);
+		verify(accountRepository).findById(1L);
+
+		assertEquals(updatedName, actualResponse.getName());
+	}
+
+	@Test
+	@DisplayName("Delete account should return exception error")
+	public void updateAccount_ShouldReturnError_Test() {
+		Optional<Account> regularAccount = Optional.empty();
+		AccountRequestDto mockedUpdatePayload = mock(AccountRequestDto.class);
+		when(accountRepository.findById(0L)).thenReturn(regularAccount);
+		assertThrows(AccountNotFoundException.class, () -> accountService.updateAccount(mockedUpdatePayload));
+		verify(accountRepository).findById(0L);
+	}
+
+
 }

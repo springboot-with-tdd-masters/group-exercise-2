@@ -264,4 +264,35 @@ public class AccountControllerTest {
 
 		verify(accountService).createTransaction("xxx", 1L, 100d);
 	}
+
+
+
+	@Test
+	@DisplayName("Should update account name and return updated value and http status 200")
+	public void updateAccountName() throws Exception {
+		AccountDto expectedResponse = new AccountDto();
+		expectedResponse.setType("regular");
+		expectedResponse.setName("Juan Dela Cruz");
+		expectedResponse.setAcctNumber("123456");
+		expectedResponse.setMinimumBalance(500d);
+
+		AccountRequestDto accountRequest = new AccountRequestDto();
+		accountRequest.setId(1L);
+		accountRequest.setName("Juan Dela Cruz");
+		accountRequest.setType("regular");
+
+		when(accountService.updateAccount(accountRequest))
+				.thenReturn(expectedResponse);
+
+		this.mockMvc.perform(post("/accounts").content(
+						objectMapper.writeValueAsString(accountRequest)
+				).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.type").value("regular"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Juan Dela Cruz"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.acctNumber").value("123456"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.minimumBalance").value("500.0"));
+
+		verify(accountService).updateAccount(accountRequest);
+	}
 }
