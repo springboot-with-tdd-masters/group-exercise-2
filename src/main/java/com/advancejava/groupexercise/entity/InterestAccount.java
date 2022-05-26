@@ -5,8 +5,6 @@ import lombok.Data;
 
 import javax.persistence.Entity;
 
-import static com.advancejava.groupexercise.helper.RandomNumberGeneratorUtility.generate;
-
 @Data
 @Entity
 @JsonTypeName("interest")

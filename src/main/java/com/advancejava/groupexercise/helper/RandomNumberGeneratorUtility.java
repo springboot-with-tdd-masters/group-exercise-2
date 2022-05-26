@@ -2,8 +2,7 @@ package com.advancejava.groupexercise.helper;
 
 import java.util.Random;
 
-public class RandomNumberGeneratorUtility {
-
+public abstract class RandomNumberGeneratorUtility {
 
     public static String generate() {
         Random r = new Random();

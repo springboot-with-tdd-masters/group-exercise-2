@@ -1,5 +1,6 @@
 package com.advancejava.groupexercise.entity;
 
+import com.advancejava.groupexercise.helper.RandomNumberGeneratorUtility;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -24,8 +25,7 @@ import javax.persistence.*;
         @JsonSubTypes.Type(value = CheckingAccount.class, name = "checking"),
         @JsonSubTypes.Type(value = InterestAccount.class, name = "interest")}
         )
-public abstract class Account {
-
+public abstract class Account extends RandomNumberGeneratorUtility {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
