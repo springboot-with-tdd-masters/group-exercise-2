@@ -1,6 +1,6 @@
-package com.advancejava.groupexercise1.helper;
+package com.advancejava.groupexercise.helper;
 
-import com.advancejava.groupexercise1.entity.Account;
+import com.advancejava.groupexercise.entity.Account;
 import org.springframework.stereotype.Component;
 
 @Component

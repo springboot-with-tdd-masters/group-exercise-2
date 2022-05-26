@@ -1,8 +1,8 @@
-package com.advancejava.groupexercise1.controller;
+package com.advancejava.groupexercise.controller;
 
-import com.advancejava.groupexercise1.entity.Account;
-import com.advancejava.groupexercise1.service.BankService;
-import com.advancejava.groupexercise1.model.Deposit;
+import com.advancejava.groupexercise.entity.Account;
+import com.advancejava.groupexercise.service.BankService;
+import com.advancejava.groupexercise.model.Deposit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

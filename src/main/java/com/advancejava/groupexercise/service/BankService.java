@@ -1,7 +1,7 @@
-package com.advancejava.groupexercise1.service;
+package com.advancejava.groupexercise.service;
 
-import com.advancejava.groupexercise1.entity.Account;
-import com.advancejava.groupexercise1.model.Deposit;
+import com.advancejava.groupexercise.entity.Account;
+import com.advancejava.groupexercise.model.Deposit;
 
 import java.util.List;
 

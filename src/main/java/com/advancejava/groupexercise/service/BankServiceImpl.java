@@ -1,10 +1,11 @@
-package com.advancejava.groupexercise1.service;
+package com.advancejava.groupexercise.service;
 
-import com.advancejava.groupexercise1.entity.Account;
-import com.advancejava.groupexercise1.helper.CheckAccountType;
-import com.advancejava.groupexercise1.helper.CheckBalance;
-import com.advancejava.groupexercise1.repository.AccountRepository;
-import com.advancejava.groupexercise1.model.Deposit;
+import com.advancejava.groupexercise.entity.Account;
+import com.advancejava.groupexercise.helper.CustomResponse;
+import com.advancejava.groupexercise.helper.CheckAccountType;
+import com.advancejava.groupexercise.helper.CheckBalance;
+import com.advancejava.groupexercise.model.Deposit;
+import com.advancejava.groupexercise.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @Service
-public class BankServiceImpl implements BankService{
+public class BankServiceImpl implements BankService {
 
     @Autowired
     AccountRepository accountRepository;
@@ -28,11 +29,8 @@ public class BankServiceImpl implements BankService{
         if(accountRepository.findById(id).isPresent()){
             return accountRepository.findById(id).get();
         }else {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "entity not found"
-            );
+            throw CustomResponse.NotFound("entity not found");
         }
-
     }
 
     public List<Account> getAccounts(){
@@ -49,16 +47,14 @@ public class BankServiceImpl implements BankService{
         Account acct;
         //get Account data by Id
         if (accountRepository.findById(id).isEmpty()){
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "entity not found");
+            throw CustomResponse.NotFound("entity not found");
         }
         acct = accountRepository.findById(id).get();
 
         //validate amount
         double amount = dep.getAmount();
         while (amount < 0 ) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "invalid amount entry...");
+            throw CustomResponse.badRequest("invalid amount entry...");
         }
         String type = dep.getType();
         switch(type){
@@ -71,8 +67,7 @@ public class BankServiceImpl implements BankService{
                 acct.setId(id);
                 break;
             default:
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "no such entry...");
+                throw CustomResponse.badRequest( "no such entry...");
         }
         //check regular, checking
         //TODO: check interest
@@ -89,6 +84,7 @@ public class BankServiceImpl implements BankService{
         getAccount(id);
         accountRepository.deleteById(id);
     }
+
 
 
 }

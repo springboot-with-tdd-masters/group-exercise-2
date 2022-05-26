@@ -1,18 +1,20 @@
-package com.advancejava.groupexercise1.entity;
+package com.advancejava.groupexercise.entity;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import lombok.Data;
 
 import javax.persistence.Entity;
-import java.util.Random;
 
+import static com.advancejava.groupexercise.helper.RandomNumberGeneratorUtility.generate;
+
+@Data
 @Entity
 @JsonTypeName("interest")
 public class InterestAccount extends Account{
 
     public InterestAccount() {
-        Random random = new Random();
-        //System.out.println();
-        this.setAcctNumber(String.valueOf(random.nextInt(1000000)));
+
+        this.setAcctNumber(generate());
         this.setBalance(0.00);
         this.setMinimumBalance(0.00);
         this.setPenalty(0.00);

@@ -1,4 +1,4 @@
-package com.advancejava.groupexercise1.constants;
+package com.advancejava.groupexercise.constants;
 
 public enum TypeEnum {
      regular,interest,checking

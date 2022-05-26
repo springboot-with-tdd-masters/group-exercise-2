@@ -1,4 +1,4 @@
-package com.advancejava.groupexercise1;
+package com.advancejava.groupexercise;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

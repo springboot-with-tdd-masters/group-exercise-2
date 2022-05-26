@@ -1,17 +1,20 @@
-package com.advancejava.groupexercise1.entity;
+package com.advancejava.groupexercise.entity;
 
-import com.advancejava.groupexercise1.constants.TypeEnum;
-import com.advancejava.groupexercise1.helper.RandomNumberGeneratorUtility;
+import com.advancejava.groupexercise.constants.TypeEnum;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import lombok.Data;
 
 import javax.persistence.Entity;
 
+import static com.advancejava.groupexercise.helper.RandomNumberGeneratorUtility.generate;
+
+@Data
 @Entity
 @JsonTypeName("checking")
 public class CheckingAccount extends Account{
 
     public CheckingAccount() {
-        this.setAcctNumber(RandomNumberGeneratorUtility.generate());
+        this.setAcctNumber(generate());
         this.setBalance(100.00);
         this.setMinimumBalance(100.00);
         this.setPenalty(10.00);

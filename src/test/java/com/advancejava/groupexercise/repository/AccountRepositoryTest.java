@@ -1,6 +1,6 @@
-package com.advancejava.groupexercise1.repository;
+package com.advancejava.groupexercise.repository;
 
-import com.advancejava.groupexercise1.entity.RegularAccount;
+import com.advancejava.groupexercise.entity.RegularAccount;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

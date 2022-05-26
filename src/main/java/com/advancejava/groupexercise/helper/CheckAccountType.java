@@ -1,12 +1,11 @@
-package com.advancejava.groupexercise1.helper;
+package com.advancejava.groupexercise.helper;
 
-import com.advancejava.groupexercise1.entity.Account;
-import org.springframework.data.crossstore.ChangeSetPersister;
+import com.advancejava.groupexercise.entity.Account;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CheckAccountTypeImpl implements CheckAccountType{
-    @Override
+public class CheckAccountType{
+    
     public Account checkAccountType(Account account) {
         String acctType = account.getType();
 

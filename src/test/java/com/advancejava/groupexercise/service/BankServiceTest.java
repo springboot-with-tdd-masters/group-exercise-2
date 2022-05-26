@@ -1,8 +1,7 @@
-package com.advancejava.groupexercise1.service;
+package com.advancejava.groupexercise.service;
 
-import com.advancejava.groupexercise1.entity.Account;
-import com.advancejava.groupexercise1.model.AccountRequest;
-import com.advancejava.groupexercise1.repository.AccountRepository;
+import com.advancejava.groupexercise.entity.Account;
+import com.advancejava.groupexercise.repository.AccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

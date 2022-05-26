@@ -1,10 +1,6 @@
-package com.advancejava.groupexercise1.controller;
+package com.advancejava.groupexercise.controller;
 
-import com.advancejava.groupexercise1.entity.Account;
-import com.advancejava.groupexercise1.entity.RegularAccount;
-import com.advancejava.groupexercise1.model.AccountRequest;
-import com.advancejava.groupexercise1.service.BankService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.advancejava.groupexercise.service.BankService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

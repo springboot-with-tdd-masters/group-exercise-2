@@ -1,4 +1,4 @@
-package com.advancejava.groupexercise1.helper;
+package com.advancejava.groupexercise.helper;
 
 import java.util.Random;
 
