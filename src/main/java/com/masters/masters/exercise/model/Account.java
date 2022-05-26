@@ -19,7 +19,7 @@ import java.util.Random;
         @JsonSubTypes.Type(value = InterestAccount.class, name="interest")
 })
 @Table
-public abstract class Account {
+public abstract class Account extends AuditModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

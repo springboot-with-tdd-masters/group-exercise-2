@@ -7,6 +7,8 @@ import com.masters.masters.exercise.model.Account;
 import com.masters.masters.exercise.model.dto.AccountDto;
 import com.masters.masters.exercise.services.AccountServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +25,8 @@ public class AccountController {
 
     //get all accounts
     @GetMapping
-    public ResponseEntity<List<Account>> getAllAccounts() throws RecordNotFoundException {
-        List<Account> list = accountService.getAllAccounts();
-        return new ResponseEntity<List<Account>>(list, new HttpHeaders(), HttpStatus.OK);
+    public Page<Account> getAllAccounts(Pageable pageable) {
+        return accountService.getAllAccounts(pageable);
     }
 
     // create

@@ -28,7 +28,7 @@ public class ScheduledInterestRate {
 	
 	@Scheduled(cron = "0 0 0 L * ?")
 	public void applyInterestRate() {
-		List<Account> accounts = accountRepository.findAll();
+		List<Account> accounts = (List<Account>) accountRepository.findAll();
 		
 		accounts.stream().forEach(account -> {
 			if(account instanceof InterestAccount) {

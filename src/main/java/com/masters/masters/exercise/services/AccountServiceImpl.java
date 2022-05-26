@@ -7,6 +7,8 @@ import com.masters.masters.exercise.model.*;
 import com.masters.masters.exercise.model.dto.AccountDto;
 import com.masters.masters.exercise.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -58,14 +60,18 @@ public class AccountServiceImpl {
 		return result;
 	}
 
-	public List<Account> getAllAccounts() throws RecordNotFoundException {
+	public Page<Account> getAllAccounts(Pageable pageable) {
+		return repo.findAll(pageable);
+	}
+
+	/*public List<Account> getAllAccounts() throws RecordNotFoundException {
 		List<Account> accountList = repo.findAll();
 		if (accountList.size() > 0) {
 			return accountList;
 		} else {
 			throw new RecordNotFoundException("No Record Found");
 		}
-	}
+	}*/
 	
 	public Account getAccountById(Long id) throws RecordNotFoundException {
 		Optional<Account> account = repo.findById(id);
