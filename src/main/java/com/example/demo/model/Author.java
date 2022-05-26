@@ -21,7 +21,7 @@ public class Author extends CustomEntityAudit{
     private String name;
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name ="cp_fk",referencedColumnName = "id")
+    @JoinColumn(name ="ab_fk",referencedColumnName = "id")
     private List<Book> books;
 
 }
