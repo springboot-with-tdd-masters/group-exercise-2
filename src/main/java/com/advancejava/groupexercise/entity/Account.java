@@ -42,15 +42,16 @@ public abstract class Account extends RandomNumberGeneratorUtility {
     @NotNull
     protected Double balance;
 
+    @JsonIgnore
     @NotNull
     protected Double minimumBalance;
-
+    @JsonIgnore
     @NotNull
     protected Double penalty;
-
+    @JsonIgnore
     @NotNull
     protected Double transactionCharge;
-
+    @JsonIgnore
     @NotNull
     protected Double interestCharge;
 
