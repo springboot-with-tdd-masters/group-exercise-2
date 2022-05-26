@@ -29,7 +29,7 @@ import javax.persistence.OneToMany;
 	@Type(value = CheckingAccount.class, name = "checking"),
 	@Type(value = InterestAccount.class, name = "interest")
 })
-public abstract class Account {
+public abstract class Account extends AuditModel{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
