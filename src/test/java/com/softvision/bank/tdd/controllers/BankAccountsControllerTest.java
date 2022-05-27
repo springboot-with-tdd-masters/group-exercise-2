@@ -1,5 +1,6 @@
 package com.softvision.bank.tdd.controllers;
 
+import static com.softvision.bank.tdd.UserMocks.MOCK_USER1_USERNAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softvision.bank.tdd.ApplicationConstants;
+import com.softvision.bank.tdd.SecurityTestConfig;
 import com.softvision.bank.tdd.model.CheckingAccount;
 import com.softvision.bank.tdd.model.InterestAccount;
 import com.softvision.bank.tdd.model.RegularAccount;
@@ -23,9 +25,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -36,7 +40,7 @@ import com.softvision.bank.tdd.model.Account;
 import static com.softvision.bank.tdd.AccountMocks.*;
 
 @AutoConfigureMockMvc
-@WebMvcTest(controllers = BankAccountsController.class)
+@SpringBootTest(classes = SecurityTestConfig.class)
 class BankAccountsControllerTest {
 
 	@Autowired
@@ -48,6 +52,7 @@ class BankAccountsControllerTest {
 	static final ObjectMapper objectMapper = new ObjectMapper();
 	@Nested
 	@DisplayName("Get Account By Id Tests")
+	@WithUserDetails(MOCK_USER1_USERNAME)
 	class GetAccountByIdTests {
 		@Test
 		@DisplayName("Should get Regular Account by Id")
@@ -113,6 +118,7 @@ class BankAccountsControllerTest {
 
 	@Nested
 	@DisplayName("Get Accounts")
+	@WithUserDetails(MOCK_USER1_USERNAME)
 	class GetAccountsTests {
 		@Test
 		@DisplayName("Should get all accounts")
@@ -160,6 +166,7 @@ class BankAccountsControllerTest {
 
 	@Nested
 	@DisplayName("Create Account")
+	@WithUserDetails(MOCK_USER1_USERNAME)
 	class CreateAccountTests {
 		@Test
 		@DisplayName("Should create regular account")
@@ -221,7 +228,7 @@ class BankAccountsControllerTest {
 		}
 
 		@Test
-		@DisplayName("Should throw bad requst exception ")
+		@DisplayName("Should throw bad request exception ")
 		void test_throw_BadRequestException() throws Exception {
 			when(bankAccountsService.createUpdate(argThat(account ->
 					MOCK_NAME.equals(account.getName())
@@ -230,6 +237,13 @@ class BankAccountsControllerTest {
 					.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
 			verify(bankAccountsService, atMostOnce()).createUpdate(any());
 		}
+	}
+
+	@Test
+	@DisplayName("Given an anonymous user, response should give http status 403 (forbidden).")
+	@WithAnonymousUser()
+	void test_getAll_fail_unauthorized() throws Exception {
+		mockMvc.perform(get("/accounts")).andExpect(status().isForbidden());
 	}
 
 }

@@ -1,29 +1,34 @@
 package com.softvision.bank.tdd.controllers;
 
+import static com.softvision.bank.tdd.UserMocks.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.softvision.bank.tdd.SecurityTestConfig;
 import com.softvision.bank.tdd.services.TransactionService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
 import com.softvision.bank.tdd.AccountMocks;
 import com.softvision.bank.tdd.exceptions.BadRequestException;
 import com.softvision.bank.tdd.model.Transaction;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 @AutoConfigureMockMvc
-@WebMvcTest(controllers = TransactionController.class)
+@SpringBootTest(classes = SecurityTestConfig.class)
 class TransactionControllerTest {
 
 	@Autowired
@@ -39,6 +44,7 @@ class TransactionControllerTest {
 	private static final Double MOCK_AMOUNT = 150.0;
 	@Nested
 	@DisplayName("Should be relative which the service return")
+	@WithUserDetails(MOCK_USER2_USERNAME)
 	class Deposit {
 
 		@Test
@@ -92,16 +98,24 @@ class TransactionControllerTest {
 			verify(transactionService, atMostOnce()).transact(anyLong(), any());
 		}
 
+		@Test
+		@DisplayName("Should throw BadRequestException")
+		void test_throw_BadRequestException() throws Exception {
+			when(transactionService.transact(anyLong(), any())).thenThrow(BadRequestException.class);
+			mockMvc.perform(post("/accounts/1/transactions").contentType(MediaType.APPLICATION_JSON))
+					.andExpect(status().isBadRequest());
+
+			verify(transactionService, atMostOnce()).transact(anyLong(), any());
+		}
 	}
 
-	@Test
-	@DisplayName("Should throw BadRequestException")
-	void test_throw_BadRequestException() throws Exception {
-		when(transactionService.transact(anyLong(), any())).thenThrow(BadRequestException.class);
-		mockMvc.perform(post("/accounts/1/transactions").contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isBadRequest());
 
-		verify(transactionService, atMostOnce()).transact(anyLong(), any());
+
+	@Test
+	@DisplayName("Given an anonymous user, response should give http status 403 (forbidden).")
+	@WithAnonymousUser()
+	void test_getAll_fail_unauthorized() throws Exception {
+		mockMvc.perform(get("/accounts")).andExpect(status().isForbidden());
 	}
 	
 }
