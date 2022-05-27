@@ -1,10 +1,10 @@
 package com.advancejava.groupexercise.service;
 
 import com.advancejava.groupexercise.entity.Account;
-import com.advancejava.groupexercise.entity.AccountTransactions;
-import com.advancejava.groupexercise.helper.CheckAccountType;
-import com.advancejava.groupexercise.helper.CheckBalance;
+import com.advancejava.groupexercise.entity.BankTransaction;
+import com.advancejava.groupexercise.helper.FilterAccount;
 import com.advancejava.groupexercise.helper.CustomResponse;
+import com.advancejava.groupexercise.model.dto.AccountRequest;
 import com.advancejava.groupexercise.model.dto.DTORequest;
 import com.advancejava.groupexercise.repository.AccountRepository;
 import com.advancejava.groupexercise.repository.AccountTxnRepository;
@@ -20,10 +20,7 @@ public class BankServiceImpl extends CustomResponse implements BankService {
     AccountRepository accountRepository;
 
     @Autowired
-    CheckBalance checkBalance;
-
-    @Autowired
-    CheckAccountType checkAccountType;
+    FilterAccount filterAccount;
 
     @Autowired
     AccountTxnRepository accountTxnRepository;
@@ -46,40 +43,16 @@ public class BankServiceImpl extends CustomResponse implements BankService {
     }
 
     @Override
-    public Account updateAccount(DTORequest dep, Integer id) {
-        Account acct;
+    public Account updateAccount(AccountRequest request, Integer id) {
+        Account account;
         //get Account data by Id
         if (accountRepository.findById(id).isEmpty()){
             throw NotFound("entity not found");
         }
-        acct = accountRepository.findById(id).get();
-
-        //validate amount
-        double amount = dep.getAmount();
-        while (amount < 0 ) {
-            throw badRequest("invalid amount...");
-        }
-        String type = dep.getType();
-        switch(type){
-            case "deposit":
-                acct.setBalance(acct.getBalance() + amount);
-                acct.setId(id);
-                break;
-            case "withdraw":
-                acct.setBalance(acct.getBalance() - amount);
-                acct.setId(id);
-                break;
-            default:
-                throw badRequest( "no such entry...");
-        }
-        //check regular, checking
-        //TODO: check interest
-        checkAccountType.checkAccountType(acct);
-
-        //check deductible if below minimum for regular
-        acct.setBalance(checkBalance.isBelowMinimumBalance(acct));
-        return accountRepository.save(acct);
-
+        account = accountRepository.findById(id).get();
+        account.setName(request.getName());
+        account.setType(request.getType());
+        return accountRepository.save(account);
     }
 
     @Override
@@ -89,51 +62,52 @@ public class BankServiceImpl extends CustomResponse implements BankService {
     }
 
     @Override
-    public AccountTransactions updateTxn(Account account, DTORequest dep, Integer id) {
+    public BankTransaction updateTransaction(DTORequest request, Integer id) {
 
-        Account acct;
+        Account account;
         //get Account data by Id
         if (accountRepository.findById(id).isEmpty()){
             throw NotFound("entity not found");
         }
-        acct = accountRepository.findById(id).get();
+        account = accountRepository.findById(id).get();
 
         //validate amount
-        double amount = dep.getAmount();
+        double amount = request.getAmount();
         while (amount < 0 ) {
             throw badRequest("invalid amount...");
         }
-        String type = dep.getType();
-        switch(type){
+        //transactionType
+        String transactionType = request.getType();
+        switch(transactionType){
             case "deposit":
-                acct.setBalance(acct.getBalance() + amount);
-                acct.setId(id);
+                account.setBalance(account.getBalance() + amount);
+                account.setId(id);
                 break;
             case "withdraw":
-                acct.setBalance(acct.getBalance() - amount);
-                acct.setId(id);
+                account.setBalance(account.getBalance() - amount);
+                account.setId(id);
                 break;
             default:
                 throw badRequest( "no such entry...");
         }
         //check regular, checking
         //TODO: check interest
-        checkAccountType.checkAccountType(acct);
+        filterAccount.checkAccountType(account);
 
         //check deductible if below minimum for regular
-        acct.setBalance(checkBalance.isBelowMinimumBalance(acct));
+        account.setBalance(filterAccount.isBelowMinimumBalance(account));
 
 
 
 
-        AccountTransactions accountTransactions = new AccountTransactions();
-        accountTransactions.setAccount(acct);
+        BankTransaction accountTransactions = new BankTransaction();
+        accountTransactions.setAccount(account);
         return accountTxnRepository.save(accountTransactions);
 
     }
 
     @Override
-    public AccountTransactions getTxn(Long id) {
+    public BankTransaction getTransaction(Long id) {
         return accountTxnRepository.findById(id).get();
     }
 

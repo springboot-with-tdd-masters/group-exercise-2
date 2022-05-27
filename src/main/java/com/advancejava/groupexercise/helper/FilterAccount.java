@@ -4,7 +4,7 @@ import com.advancejava.groupexercise.entity.Account;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CheckAccountType{
+public class FilterAccount {
     
     public Account checkAccountType(Account account) {
         String acctType = account.getType();
@@ -23,5 +23,13 @@ public class CheckAccountType{
                 throw new RuntimeException("Not Found");
         }
         return account;
+    }
+
+    public double isBelowMinimumBalance(Account acct){
+        if(acct.getBalance() < acct.getMinimumBalance()){
+            return acct.getBalance() - acct.getPenalty();
+        }else{
+            return acct.getBalance();
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.advancejava.groupexercise.model;
+package com.advancejava.groupexercise.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

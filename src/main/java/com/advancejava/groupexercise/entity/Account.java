@@ -34,25 +34,25 @@ public abstract class Account extends RandomNumberGeneratorUtility {
     private String type;
 
     @NotNull
-    protected String name;
+    private String name;
 
     @NotNull
-    protected String acctNumber;
+    private String acctNumber;
 
     @NotNull
-    protected Double balance;
+    private Double balance;
 
     @JsonIgnore
     @NotNull
-    protected Double minimumBalance;
+    private Double minimumBalance;
     @JsonIgnore
     @NotNull
-    protected Double penalty;
+    private Double penalty;
     @JsonIgnore
     @NotNull
-    protected Double transactionCharge;
+    private Double transactionCharge;
     @JsonIgnore
     @NotNull
-    protected Double interestCharge;
+    private Double interestCharge;
 
 }
