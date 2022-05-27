@@ -9,6 +9,9 @@ import com.advancejava.groupexercise.model.dto.DTORequest;
 import com.advancejava.groupexercise.repository.AccountRepository;
 import com.advancejava.groupexercise.repository.AccountTxnRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,6 +34,17 @@ public class BankServiceImpl extends CustomResponse implements BankService {
         }else {
             throw NotFound("entity not found");
         }
+    }
+
+    public Page<Account> getAccountsWithPaginationAndSort(int offset, int pageSize, String field, String order){
+        Sort sOrder = order.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(field).ascending() : Sort.by(field).descending();
+        return  accountRepository.findAll(PageRequest.of(offset, pageSize, sOrder));
+    }
+
+    @Override
+    public Page<BankTransaction> getBankTxnsWithPaginationAndSort(int page, int limit, String field, String order) {
+        Sort sOrder = order.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(field).ascending() : Sort.by(field).descending();
+        return accountTxnRepository.findAll(PageRequest.of(page, limit, sOrder));
     }
 
     public List<Account> getAccounts(){
@@ -96,9 +110,6 @@ public class BankServiceImpl extends CustomResponse implements BankService {
 
         //check deductible if below minimum for regular
         account.setBalance(filterAccount.isBelowMinimumBalance(account));
-
-
-
 
         BankTransaction accountTransactions = new BankTransaction();
         accountTransactions.setAccount(account);

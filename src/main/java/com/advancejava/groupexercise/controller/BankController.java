@@ -1,10 +1,13 @@
 package com.advancejava.groupexercise.controller;
 
 import com.advancejava.groupexercise.entity.Account;
+import com.advancejava.groupexercise.entity.BankTransaction;
 import com.advancejava.groupexercise.model.dto.AccountRequest;
+import com.advancejava.groupexercise.model.dto.DTOResponse;
 import com.advancejava.groupexercise.service.BankService;
 import com.advancejava.groupexercise.model.dto.DTORequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,5 +56,18 @@ public class BankController {
         //Account account = bankService.getAccount(id);
         bankService.updateTransaction(request,id);
         return bankService.getAccount(id);
+    }
+
+    @GetMapping("/accounts/{field}/{order}")
+    private DTOResponse<Page<Account>> getAccountsWithPaginationAndSort(@RequestParam int page, @RequestParam int limit,
+                                                                      @PathVariable String field, @PathVariable String order) {
+        Page<Account> accounts = bankService.getAccountsWithPaginationAndSort(page, limit, field,order);
+        return new DTOResponse<>(accounts.getSize(), accounts);
+    }
+    @GetMapping("/transactions/{field}/{order}")
+    private DTOResponse<Page<BankTransaction>> getBankTxnsWithPaginationAndSort(@RequestParam int page, @RequestParam int limit,
+                                                                                @PathVariable String field, @PathVariable String order) {
+        Page<BankTransaction> txn = bankService.getBankTxnsWithPaginationAndSort(page, limit, field,order);
+        return new DTOResponse<>(txn.getSize(), txn);
     }
 }
