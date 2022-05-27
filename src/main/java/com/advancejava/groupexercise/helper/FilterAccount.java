@@ -19,6 +19,9 @@ public class FilterAccount {
                 account.setBalance(account.getBalance() - account.getTransactionCharge());
                 //10 below minimum
                 break;
+            case "interest":
+                account.setBalance(account.getBalance());
+                break;
             default:
                 throw new RuntimeException("Not Found");
         }

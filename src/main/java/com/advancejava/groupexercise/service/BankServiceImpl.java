@@ -105,7 +105,6 @@ public class BankServiceImpl extends CustomResponse implements BankService {
                 throw badRequest( "no such entry...");
         }
         //check regular, checking
-        //TODO: check interest
         filterAccount.checkAccountType(account);
 
         //check deductible if below minimum for regular
