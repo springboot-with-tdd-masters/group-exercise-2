@@ -43,12 +43,6 @@ public class AccountController {
 		return accountService.getAccount(id);
 	}
 
-	@PostMapping("/{id}/transactions")
-	public AccountDto makeTransaction(@PathVariable long id, 
-			@RequestBody TransactionRequestDto transactRequest) {
-		return accountService.createTransaction(transactRequest.getType(), id, transactRequest.getAmount());
-	}	
-	
 	@DeleteMapping("/{id}")
 	public void deleteAccount(@PathVariable long id) {
 		accountService.deleteAccount(id);

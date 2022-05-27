@@ -40,4 +40,10 @@ public class RestExceptionHandler {
 	public final ResponseEntity<String> handleInvalidTransactionTypeException(Exception e, WebRequest req) {
 		return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
 	}
+	
+	
+	@ExceptionHandler(TransactionNotFoundException.class)
+	public final ResponseEntity<String> handleTransactionNotFoundException(Exception e, WebRequest req) {
+		return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+	}
 }
