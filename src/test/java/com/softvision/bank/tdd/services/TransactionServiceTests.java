@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.softvision.bank.tdd.repository.AccountRepository;
+import com.softvision.bank.tdd.repository.TransactionRepository;
 
 import static com.softvision.bank.tdd.AccountMocks.*;
 import static org.mockito.Mockito.*;
@@ -22,6 +23,10 @@ public class TransactionServiceTests {
 
     @Mock
     AccountRepository mockedAccountRepository;
+    
+    @Mock 
+    TransactionRepository mockedTransactionRepository;
+    
     @InjectMocks
     TransactionService transactionService = new TransactionServiceImpl();
 
