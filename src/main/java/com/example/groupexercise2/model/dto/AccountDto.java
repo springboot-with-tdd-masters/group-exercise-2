@@ -1,10 +1,11 @@
 package com.example.groupexercise2.model.dto;
 
+import java.util.Date;
 import java.util.Objects;
 
 import com.example.groupexercise2.model.Account;
 
-public class AccountDto {
+public class AccountDto extends BaseDto {
 	
 	private String type;
 	private Long id;
@@ -19,7 +20,9 @@ public class AccountDto {
 	public AccountDto() {}
 	
 	public AccountDto(String type, Long id, String name, String acctNumber, Double balance, Double minimumBalance, Double penalty,
-			Double transactionCharge, Double interestCharge) {
+			Double transactionCharge, Double interestCharge, Date createdAt, Date updatedAt) {
+
+		super(createdAt,updatedAt);
 		this.type = type;
 		this.id = id;
 		this.name = name;
@@ -29,12 +32,14 @@ public class AccountDto {
 		this.penalty = penalty;
 		this.transactionCharge = transactionCharge;
 		this.interestCharge = interestCharge;
+
+
 	}
 	
 	public AccountDto(Account account) {
 		this(account.getType(), account.getId(), account.getName(), account.getAcctNumber(), account.getBalance(),
 				account.getMinimumBalance(), account.getPenalty(), account.getTransactionCharge(), 
-				account.getInterestCharge());
+				account.getInterestCharge(),account.getCreatedAt(),account.getUpdatedAt());
 	}
 
 	public String getType() {

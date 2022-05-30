@@ -1,12 +1,11 @@
 package com.example.groupexercise2.model.dto;
 
+import com.example.groupexercise2.model.Transaction;
 import java.util.Date;
 import java.util.Objects;
 
-import com.example.groupexercise2.model.Transaction;
-
 public class TransactionDto extends BaseDto {
-	
+
   private Date createdAt;
   private Date updatedAt;
   private Long id;
@@ -14,20 +13,23 @@ public class TransactionDto extends BaseDto {
   private Double amount;
   private AccountDto account;
 
-  public TransactionDto() {}
-  
-  public TransactionDto(Date createdAt, Date updatedAt, Long id, String transactionType, Double amount, AccountDto account) {
-	this.createdAt = createdAt;
-	this.updatedAt = updatedAt;
-	this.id = id;
+  public TransactionDto() {
+    super();
+  }
+
+  public TransactionDto(Date createdAt, Date updatedAt, Long id, String transactionType,
+      Double amount, AccountDto account) {
+    super(createdAt, updatedAt);
+    this.id = id;
     this.transactionType = transactionType;
     this.amount = amount;
     this.account = account;
   }
 
   public TransactionDto(Transaction transaction) {
-    this(transaction.getCreatedAt(), transaction.getUpdatedAt(), transaction.getId(), 
-    		transaction.getTransactionType(), transaction.getAmount(), new AccountDto(transaction.getAccount()));
+    this(transaction.getCreatedAt(), transaction.getUpdatedAt(), transaction.getId(),
+        transaction.getTransactionType(), transaction.getAmount(),
+        new AccountDto(transaction.getAccount()));
   }
 
   public Long getId() {
@@ -61,9 +63,9 @@ public class TransactionDto extends BaseDto {
   public void setAccount(AccountDto account) {
     this.account = account;
   }
-  
+
   public static TransactionDto convertToDto(Transaction transaction) {
-	  return new TransactionDto(transaction);
+    return new TransactionDto(transaction);
   }
 
   @Override

@@ -7,6 +7,14 @@ public abstract class BaseDto {
   private Date createdAt;
   private Date updatedAt;
 
+  public BaseDto(Date createdAt, Date updatedAt) {
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+  }
+
+  public BaseDto() {
+  }
+
   public Date getCreatedAt() {
     return createdAt;
   }
