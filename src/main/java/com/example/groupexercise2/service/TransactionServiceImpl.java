@@ -5,6 +5,8 @@ import java.time.Period;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.groupexercise2.exeption.AccountNotFoundException;
@@ -143,5 +145,10 @@ public class TransactionServiceImpl implements TransactionService {
 		accountRepository.findById(accountId).orElseThrow(AccountNotFoundException::new);
 		transactionRepository.findById(transactionId).orElseThrow(TransactionNotFoundException::new);
 		transactionRepository.deleteById(transactionId);
+	}
+
+	@Override
+	public Page<TransactionDto> getAllTransactions(Long accountId, Pageable pageable) {
+		return transactionRepository.findByAccountId(accountId, pageable).map(TransactionDto::convertToDto);
 	}
 }

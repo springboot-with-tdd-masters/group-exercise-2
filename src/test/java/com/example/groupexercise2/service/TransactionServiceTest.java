@@ -1,6 +1,7 @@
 package com.example.groupexercise2.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,6 +28,7 @@ import com.example.groupexercise2.service.TransactionService;
 import com.example.groupexercise2.service.TransactionServiceImpl;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +36,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 public class TransactionServiceTest {
 
@@ -475,5 +482,40 @@ public class TransactionServiceTest {
 		when(transactionRepository.findById(1L)).thenReturn(regulatransactiotransactionnrAccount);
 		assertThrows(AccountNotFoundException.class, () -> transactionService.delete(1L, 1L));
 	}
+	
+	@Test
+	@DisplayName("Get all transactions with paging and sorting")
+	public void getAllTransactionsWithPagingAndSorting() {
+		Account regAccount = new RegularAccount();
+		regAccount.setAcctNumber("012345678");
+		
+		Transaction  withdraw = new Transaction();
+		withdraw.setTransactionType("withdraw");
+		withdraw.setAmount(100d);
+		withdraw.setAccount(regAccount);
+		 
+		Transaction deposit = new Transaction();
+		deposit.setTransactionType("deposit");
+		deposit.setAmount(1000d);
+		deposit.setAccount(regAccount);
+
+		Page<Transaction> transactions = new PageImpl(Arrays.asList(deposit, withdraw));
+
+		Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+		when(transactionRepository.findByAccountId(1L, pageable))
+			.thenReturn(transactions);
+
+		Page<TransactionDto> pagedTransactions = transactionService.getAllTransactions(1L,pageable);
+		    
+		assertAll(
+		 	() -> assertEquals(1, pagedTransactions.getTotalPages()),
+			() -> assertEquals(2, pagedTransactions.getTotalElements()),
+			() -> assertEquals(2, pagedTransactions.getNumberOfElements()),
+			() -> assertEquals("deposit", pagedTransactions.getContent().get(0).getTransactionType()),
+			() -> assertEquals("012345678", pagedTransactions.getContent().get(0).getAccount().getAcctNumber()),			   
+			() -> assertEquals("withdraw", pagedTransactions.getContent().get(1).getTransactionType()),
+			() -> assertEquals("012345678", pagedTransactions.getContent().get(1).getAccount().getAcctNumber())
+		);		
+	}	
 
 }
