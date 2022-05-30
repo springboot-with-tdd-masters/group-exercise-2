@@ -9,9 +9,19 @@ package com.masters.masters.exercise.model.dto;
  */
 public class TransactionDto {
 
+	private Long id;
+
 	private String type;
 	
 	private double amount;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	/**
 	 * @return the transactionType

@@ -5,6 +5,7 @@ import com.masters.masters.exercise.exception.InvalidTypeException;
 import com.masters.masters.exercise.exception.RecordNotFoundException;
 import com.masters.masters.exercise.model.*;
 import com.masters.masters.exercise.model.dto.AccountDto;
+import com.masters.masters.exercise.model.dto.TransactionDto;
 import com.masters.masters.exercise.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,9 @@ public class AccountServiceImpl {
 
 	@Autowired
 	private AccountRepository repo;
+
+	@Autowired
+	private TransactionImpl transaction;
 
 	// create
 	public Account createOrUpdateAccount(AccountDto dto) throws RecordNotFoundException, InvalidTypeException, AccountExistException {
@@ -92,6 +96,20 @@ public class AccountServiceImpl {
 	
 	
 	//withdraw/deposit
+	public Account transact(Long id, TransactionDto transactionDTO) {
+		Optional<Account> optAccount = repo.findById(id);
+
+		if (!optAccount.isPresent()) {
+			//TODO throw appropriate exception
+			throw new UnsupportedOperationException("Account does not exist.");
+		}
+
+		Account account = optAccount.get();
+		transactionDTO.setType(transactionDTO.getType().toUpperCase());
+		account = repo.save(account);
+		transaction.create(account, transactionDTO);
+		return account;
+	}
 	//delete
 
 }
