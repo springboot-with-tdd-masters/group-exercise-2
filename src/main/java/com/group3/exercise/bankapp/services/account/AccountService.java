@@ -1,6 +1,7 @@
 package com.group3.exercise.bankapp.services.account;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.group3.exercise.bankapp.entities.Account;
 import com.group3.exercise.bankapp.request.CreateAccountRequest;
@@ -11,7 +12,7 @@ public interface AccountService {
     AccountResponse register(CreateAccountRequest request);
     AccountResponse withdraw(Long id, TransactionRequest request);
     AccountResponse deposit(Long id, TransactionRequest request);
-    List<AccountResponse> getAllAccounts();
+    Page<AccountResponse> getAllAccounts(Pageable page);
     AccountResponse getAccountById(Long id);
     Account deleteAccountById(Long id);
 }
