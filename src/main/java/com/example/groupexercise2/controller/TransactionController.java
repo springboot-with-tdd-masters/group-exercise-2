@@ -45,10 +45,10 @@ public class TransactionController {
 	}
 	
 	@GetMapping("/{accountId}/transactions")
-	public Page<TransactionDto> getAllTransactions(@PathVariable Long accountId, @RequestParam Map<String, String> params) {
-		int page = Integer.valueOf(params.get("page"));
-		int size = Integer.valueOf(params.get("size"));
-		String[] sort = params.get("sort").split(",");
+	public Page<TransactionDto> getAllTransactions(@PathVariable Long accountId,
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "3") int size,
+			@RequestParam(defaultValue = "id,desc") String[] sort) {
 	
 		String sortName = sort[0];
 		Sort.Direction direction = Sort.Direction.fromString(sort[1]);
