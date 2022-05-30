@@ -1,9 +1,12 @@
 package com.softvision.bank.tdd.services;
 
+import com.softvision.bank.tdd.AccountMocks;
 import com.softvision.bank.tdd.ApplicationConstants;
 import com.softvision.bank.tdd.exceptions.BadRequestException;
 import com.softvision.bank.tdd.exceptions.RecordNotFoundException;
 import com.softvision.bank.tdd.model.Account;
+import com.softvision.bank.tdd.model.CheckingAccount;
+import com.softvision.bank.tdd.model.RegularAccount;
 import com.softvision.bank.tdd.model.Transaction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,11 +15,21 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.softvision.bank.tdd.repository.AccountRepository;
 import com.softvision.bank.tdd.repository.TransactionRepository;
+import org.springframework.data.domain.*;
+import org.springframework.http.MediaType;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.softvision.bank.tdd.AccountMocks.*;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static java.util.Optional.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 public class TransactionServiceTests {
@@ -197,5 +210,31 @@ public class TransactionServiceTests {
         assertThrows(BadRequestException.class, () ->
                 transactionService.transact(CHK_MOCK_ACCT_ID, new Transaction(null, 100)));
         verify(mockedAccountRepository, atMost(2)).findById(anyLong());
+    }
+
+    @Test
+    @DisplayName("Should get transactions with pageable sorted by Amount")
+    void test_get_transaction_sorted_by_amount() {
+        List<Transaction> transactions = new ArrayList<>();
+        transactions.add(buildTransaction(AccountMocks.getMockRegularAccount(), 100, "DEPOSIT"));
+        transactions.add(buildTransaction(AccountMocks.getMockRegularAccount(), 200, "WITHDRAW"));
+
+        Pageable pageRequest = PageRequest.of(0, 3, Sort.by("amount").descending());
+        List<Transaction> sortedAccounts = transactions.stream().sorted(Comparator.comparing(Transaction::getAmount).reversed()).collect(Collectors.toList());
+        Page<Transaction> accountPage = new PageImpl<>(sortedAccounts);
+        when(transactionService.readTransactions(pageRequest)).thenReturn(accountPage);
+
+        Page<Transaction> retrievedTransactionPage = transactionService.readTransactions(pageRequest);
+
+         assertAll(() -> assertEquals(200, retrievedTransactionPage.getContent().get(0).getAmount()),
+                () -> assertEquals(100, retrievedTransactionPage.getContent().get(1).getAmount()));
+    }
+
+    private Transaction buildTransaction(RegularAccount mockRegularAccount, double amount, String type) {
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setType(type);
+        transaction.setAccount(mockRegularAccount);
+        return transaction;
     }
 }

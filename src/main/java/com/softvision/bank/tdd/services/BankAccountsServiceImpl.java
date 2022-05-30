@@ -8,6 +8,8 @@ import com.softvision.bank.tdd.exceptions.RecordNotFoundException;
 import com.softvision.bank.tdd.model.RegularAccount;
 import com.softvision.bank.tdd.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -68,5 +70,10 @@ public class BankAccountsServiceImpl implements BankAccountsService {
 		return new Random().ints(12, 48, 57)
 				.mapToObj(c -> Character.toString((char) c))
 				.collect(Collectors.joining());
+	}
+
+	@Override
+	public Page<Account> readAccounts(Pageable pageable) {
+		return repository.findAll(pageable);
 	}
 }

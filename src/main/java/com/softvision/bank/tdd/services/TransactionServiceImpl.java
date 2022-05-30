@@ -6,6 +6,8 @@ import com.softvision.bank.tdd.exceptions.InsufficientFundsAvailable;
 import com.softvision.bank.tdd.exceptions.RecordNotFoundException;
 import com.softvision.bank.tdd.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.softvision.bank.tdd.repository.AccountRepository;
 import com.softvision.bank.tdd.repository.TransactionRepository;
@@ -86,5 +88,10 @@ public class TransactionServiceImpl implements TransactionService {
 		accountRepository.findById(accountId).orElseThrow(RecordNotFoundException::new);
 		transactionRepository.findById(transactionId).orElseThrow(RecordNotFoundException::new);
 		transactionRepository.deleteById(transactionId);
+	}
+
+	@Override
+	public Page<Transaction> readTransactions(Pageable pageable) {
+		return transactionRepository.findAll(pageable);
 	}
 }

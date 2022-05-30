@@ -3,6 +3,10 @@ package com.softvision.bank.tdd.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,5 +48,11 @@ public class BankAccountsController {
 	public ResponseEntity<Account> createUpdate(@RequestBody Account account) {
 		account = bankAccountsService.createUpdate(account);
 		return new ResponseEntity<Account>(account, new HttpHeaders(), HttpStatus.CREATED);
+	}
+
+	@GetMapping("/readByPage")
+	private ResponseEntity<Page<Account>> readAccounts(@PageableDefault(sort = "id", direction = Sort.Direction.ASC)
+														Pageable pageable) {
+		return ResponseEntity.ok(bankAccountsService.readAccounts(pageable));
 	}
 }

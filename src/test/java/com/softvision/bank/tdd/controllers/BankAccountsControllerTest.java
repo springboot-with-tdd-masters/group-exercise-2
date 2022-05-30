@@ -11,7 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softvision.bank.tdd.ApplicationConstants;
@@ -27,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -147,6 +150,33 @@ class BankAccountsControllerTest {
 					.andExpect(jsonPath("$[1].penalty").value(ApplicationConstants.CHK_PENALTY))
 					.andExpect(jsonPath("$[1].transactionCharge").value(ApplicationConstants.CHK_CHARGE))
 					.andExpect(jsonPath("$[1].interestCharge").value(CHK_MOCK_INTEREST));
+
+			verify(bankAccountsService, atMostOnce()).get();
+		}
+
+		@Test
+		@DisplayName("Should get accounts with pageable sorted by Name")
+		void test_get_accounts_pageable_sort_by_name() throws Exception {
+			List<Account> accounts = new ArrayList<>();
+			accounts.add(getMockRegularAccount());
+			CheckingAccount mockCheckingAccount = getMockCheckingAccount();
+			mockCheckingAccount.setName("Anderson Brooke");
+			accounts.add(mockCheckingAccount);
+
+			Pageable pageRequest = PageRequest.of(0, 3, Sort.by("name").ascending());
+			List<Account> sortedAccounts = accounts.stream().sorted(Comparator.comparing(Account::getName)).collect(Collectors.toList());
+			Page<Account> accountPage = new PageImpl<>(sortedAccounts);
+			when(bankAccountsService.readAccounts(pageRequest)).thenReturn(accountPage);
+
+			mockMvc.perform(get("/accounts/readByPage")
+							.contentType(MediaType.APPLICATION_JSON)
+							.param("page", "0")
+							.param("size", "3")
+							.param("sort", "name,asc")
+					)
+					.andExpect(status().isOk())
+					.andExpect(jsonPath("$.content.[0].name").value("Anderson Brooke"))
+					.andExpect(jsonPath("$.content.[1].name").value(MOCK_NAME));
 
 			verify(bankAccountsService, atMostOnce()).get();
 		}
