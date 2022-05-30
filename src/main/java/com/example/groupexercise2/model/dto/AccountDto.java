@@ -109,6 +109,10 @@ public class AccountDto {
 		this.interestCharge = interestCharge;
 	}
 
+	public static AccountDto convertToDto(Account account) {
+		return new AccountDto(account);
+	}
+	
 	@Override
 	public int hashCode() {
 		return Objects.hash(acctNumber, balance, id, interestCharge, minimumBalance, name, penalty, transactionCharge,

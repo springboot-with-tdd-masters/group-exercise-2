@@ -16,6 +16,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -24,10 +29,12 @@ import com.example.groupexercise2.exeption.AccountNotFoundException;
 import com.example.groupexercise2.exeption.InvalidAccountTypeException;
 import com.example.groupexercise2.exeption.InvalidTransactionAmountException;
 import com.example.groupexercise2.exeption.InvalidTransactionTypeException;
+import com.example.groupexercise2.model.Account;
 import com.example.groupexercise2.model.dto.AccountDto;
 import com.example.groupexercise2.model.dto.AccountRequestDto;
 import com.example.groupexercise2.model.dto.TransactionRequestDto;
 import com.example.groupexercise2.service.AccountService;
+import com.example.groupexercise2.service.TransactionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest
@@ -39,6 +46,9 @@ public class AccountControllerTest {
 	 
 	 @MockBean
 	 private AccountService accountService;
+	 
+	 @MockBean
+	 private TransactionService transactionService;
 	 
 	 private ObjectMapper objectMapper = new ObjectMapper();
 	 
@@ -88,43 +98,44 @@ public class AccountControllerTest {
 		 verify(accountService).createAccount(accountRequest);  
 	}
 	
-	 @Test
-	 @DisplayName("Should return all accounts with correct details and http status 200")
-	 public void shouldReturnAllAccountsWithCorrectDetails() throws Exception {
+	@Test
+	@DisplayName("Get all acounts with paging and sorting")
+	public void getAllAccountsWithPagingAndSorting() throws Exception {
 		 //expected returned objects
-		 AccountDto regularAcctDto = new AccountDto();
-		 regularAcctDto.setType("regular");
-		 regularAcctDto.setName("Juan Dela Cruz");
-		 regularAcctDto.setMinimumBalance(500d);
+		 AccountDto regularAccount = new AccountDto();
+		 regularAccount.setType("regular");
+		 regularAccount.setName("Juan Dela Cruz");
+		 regularAccount.setMinimumBalance(500d);
 		     
-		 AccountDto checkingAcctDto = new AccountDto();
-		 checkingAcctDto.setType("checking");
-		 checkingAcctDto.setName("Juan Dela Cruz I");
-		 checkingAcctDto.setMinimumBalance(100d);
+		 AccountDto checkingAccount = new AccountDto();
+		 checkingAccount.setType("checking");
+		 checkingAccount.setName("Juan Dela Cruz I");
+		 checkingAccount.setMinimumBalance(100d);
 		
-		 AccountDto interestAcctDto = new AccountDto();
-		 interestAcctDto.setType("interest");
-		 interestAcctDto.setName("Juan Dela Cruz II");
-		 interestAcctDto.setMinimumBalance(0d);
+		 AccountDto interestAccount = new AccountDto();
+		 interestAccount.setType("interest");
+		 interestAccount.setName("Juan Dela Cruz II");
+		 interestAccount.setMinimumBalance(0d);
 		
-		 List<AccountDto> accounts = Arrays.asList(regularAcctDto, checkingAcctDto, interestAcctDto);
-		 
-		 when(accountService.getAllAccounts())
-	         	.thenReturn(accounts);
-			
-		 this.mockMvc.perform(get("/accounts"))
-				.andExpect(status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].type").value("regular"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value("Juan Dela Cruz"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].minimumBalance").value("500.0"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[1].type").value("checking"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[1].name").value("Juan Dela Cruz I"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[1].minimumBalance").value("100.0"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[2].type").value("interest"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[2].name").value("Juan Dela Cruz II"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[2].minimumBalance").value("0.0"));
+		 Page<AccountDto> pagedAccounts = new PageImpl(Arrays.asList(interestAccount, checkingAccount, regularAccount));
+
+		 Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+		 when(accountService.getAllAccounts(pageable))
+		 	.thenReturn(pagedAccounts);
+
+		 this.mockMvc.perform(get("/accounts?page=0&size=20&sort=createdAt,desc"))
+		 	.andExpect(status().isOk())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.content.[0].type").value("interest"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.content.[0].name").value("Juan Dela Cruz II"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.content.[0].minimumBalance").value("0.0"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.content.[1].type").value("checking"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.content.[1].name").value("Juan Dela Cruz I"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.content.[1].minimumBalance").value("100.0"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.content.[2].type").value("regular"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.content.[2].name").value("Juan Dela Cruz"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.content.[2].minimumBalance").value("500.0"));
 				
-		 verify(accountService).getAllAccounts();
+		 verify(accountService).getAllAccounts(pageable);
 	}
 
 

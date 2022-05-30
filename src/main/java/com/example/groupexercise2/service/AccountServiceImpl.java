@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.groupexercise2.exeption.AccountNotFoundException;
@@ -103,8 +105,8 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public List<AccountDto> getAllAccounts() {
-		return accountRepository.findAll().stream().map(a -> new AccountDto(a)).collect(Collectors.toList());
+	public Page<AccountDto> getAllAccounts(Pageable pageable) {
+		return accountRepository.findAll(pageable).map(AccountDto::convertToDto);
 	}
 
 	@Override

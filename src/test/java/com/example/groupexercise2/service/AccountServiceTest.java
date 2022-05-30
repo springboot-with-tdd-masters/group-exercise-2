@@ -1,6 +1,7 @@
 package com.example.groupexercise2.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -20,6 +21,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.example.groupexercise2.exeption.AccountNotFoundException;
 import com.example.groupexercise2.exeption.InsufficientBalanceException;
@@ -140,8 +146,8 @@ public class AccountServiceTest {
 
 
 	@Test
-	@DisplayName("Should return all accounts with correct details")
-	public void shouldReturnAllAccountsWithCorrectDetails() {
+	@DisplayName("Get all acounts with paging and sorting")
+	public void getAllAccountsWithPagingAndSorting() {
 		RegularAccount regularAccount = new RegularAccount();
 		regularAccount.setName("Juan Dela Cruz");
 		regularAccount.setMinimumBalance(500d);
@@ -153,33 +159,23 @@ public class AccountServiceTest {
 		InterestAccount interestAccount = new InterestAccount();
 		interestAccount.setName("Juan Dela Cruz II");
 		interestAccount.setMinimumBalance(0d);
+	
+		Page<Account> returnAccounts = new PageImpl(Arrays.asList(interestAccount, checkingAccount, regularAccount));
 
-		List<Account> accounts = Arrays.asList(regularAccount, checkingAccount, interestAccount);
-
-		when(accountRepository.findAll()).thenReturn(accounts);
-
-		List<AccountDto> accountDtos = accountService.getAllAccounts();
-
-		// expected returned objects
-		AccountDto regularAcctDto = new AccountDto();
-		regularAcctDto.setType("regular");
-		regularAcctDto.setName("Juan Dela Cruz");
-		regularAcctDto.setMinimumBalance(500d);
-
-		AccountDto checkingAcctDto = new AccountDto();
-		checkingAcctDto.setType("checking");
-		checkingAcctDto.setName("Juan Dela Cruz I");
-		checkingAcctDto.setMinimumBalance(100d);
-
-		AccountDto interestAcctDto = new AccountDto();
-		interestAcctDto.setType("interest");
-		interestAcctDto.setName("Juan Dela Cruz II");
-		interestAcctDto.setMinimumBalance(0d);
-
-		verify(accountRepository).findAll();
-
-		assertThat(accountDtos).hasSize(3);
-		assertThat(accountDtos).containsExactlyInAnyOrder(regularAcctDto, checkingAcctDto, interestAcctDto);
+		Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+		when(accountRepository.findAll(pageable))
+			.thenReturn(returnAccounts);
+		
+		Page<AccountDto> pagedAccounts = accountService.getAllAccounts(pageable);
+		
+		assertAll(
+		 	() -> assertEquals(1, pagedAccounts.getTotalPages()),
+			() -> assertEquals(3, pagedAccounts.getTotalElements()),
+			() -> assertEquals(3, pagedAccounts.getNumberOfElements()),
+			() -> assertEquals("interest", pagedAccounts.getContent().get(0).getType()),			   
+			() -> assertEquals("checking", pagedAccounts.getContent().get(1).getType()),			    
+			() -> assertEquals("regular", pagedAccounts.getContent().get(2).getType())
+		);
 	}
 	
 	@Test
@@ -579,6 +575,4 @@ public class AccountServiceTest {
 		assertThrows(AccountNotFoundException.class, () -> accountService.updateAccount(mockedUpdatePayload));
 		verify(accountRepository).findById(0L);
 	}
-
-
 }
