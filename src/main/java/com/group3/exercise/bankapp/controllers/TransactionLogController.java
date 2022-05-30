@@ -23,7 +23,7 @@ public class TransactionLogController {
         return transactionLogService.findAllByAccountId(accountId, pageable);
     }
 
-    @PostMapping
+    @PostMapping("/track")
     public TransactionLogResponse create(@PathVariable Long accountId, @RequestBody TransactionRequest transactionRequest) {
         return transactionLogService.createLogFor(accountId, transactionRequest);
     }

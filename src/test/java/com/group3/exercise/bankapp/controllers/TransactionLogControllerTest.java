@@ -114,7 +114,7 @@ public class TransactionLogControllerTest {
                 .thenReturn(transactionLogResponse);
 
         // Act
-        final ResultActions resultActions = mockMvc.perform(post("/accounts/1/transactions")
+        final ResultActions resultActions = mockMvc.perform(post("/accounts/1/transactions/track")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(transactionRequest)));
 
