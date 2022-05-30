@@ -187,13 +187,13 @@ public class AccountControllerTest {
 		regularAcctDto.setMinimumBalance(500d);
 		regularAcctDto.setBalance(600d);
 
-		when(accountService.createTransaction("deposit", 1L, 100d))
-				.thenReturn(regularAcctDto);
-
 		TransactionRequestDto transactRequest = new TransactionRequestDto();
 		transactRequest.setType("deposit");
 		transactRequest.setAmount(100d);
-		
+
+		when(transactionService.createTransaction(1L, transactRequest))
+				.thenReturn(regularAcctDto);
+
 		this.mockMvc.perform(post("/accounts/1/transactions").content(
 	            	objectMapper.writeValueAsString(transactRequest)
 	    		).contentType(MediaType.APPLICATION_JSON))
@@ -202,9 +202,10 @@ public class AccountControllerTest {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Juan Dela Cruz"))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.acctNumber").value("123456"))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.minimumBalance").value("500.0"))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.balance").value("600.0"));
+			.andExpect(MockMvcResultMatchers.jsonPath("$.balance").value("600.0"))
+		;
 
-		verify(accountService).createTransaction("deposit", 1L, 100d);
+		verify(transactionService).createTransaction(1L, transactRequest);
 	}
 	
 	@Test
@@ -219,13 +220,13 @@ public class AccountControllerTest {
 		regularAcctDto.setMinimumBalance(500d);
 		regularAcctDto.setBalance(500d);
 
-		when(accountService.createTransaction("withdraw", 1L, 500d))
-				.thenReturn(regularAcctDto);
-
 		TransactionRequestDto transactRequest = new TransactionRequestDto();
 		transactRequest.setType("withdraw");
 		transactRequest.setAmount(500d);
 		
+		when(transactionService.createTransaction(1L, transactRequest))
+				.thenReturn(regularAcctDto);
+			
 		this.mockMvc.perform(post("/accounts/1/transactions").content(
 	            	objectMapper.writeValueAsString(transactRequest)
 	    		).contentType(MediaType.APPLICATION_JSON))
@@ -236,43 +237,46 @@ public class AccountControllerTest {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.minimumBalance").value("500.0"))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.balance").value("500.0"));
 
-		verify(accountService).createTransaction("withdraw", 1L, 500d);
+		verify(transactionService).createTransaction(1L, transactRequest);
 	}
-	
+
 	@Test
 	@DisplayName("Should return Bad Request error for invalid transaction amount")
 	public void shouldReturnBadRequestForInvalidTransactionAmount() throws Exception {
-		when(accountService.createTransaction("deposit", 1L, -100d))
-				.thenThrow(new InvalidTransactionAmountException());
-			
+
 		TransactionRequestDto transactRequest = new TransactionRequestDto();
 		transactRequest.setType("deposit");
 		transactRequest.setAmount(-100d);
+
+		when(transactionService.createTransaction(1L, transactRequest))
+				.thenThrow(new InvalidTransactionAmountException());
 
 		this.mockMvc.perform(post("/accounts/1/transactions").content(
 		            	objectMapper.writeValueAsString(transactRequest)
 		    		).contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest());
 
-		verify(accountService).createTransaction("deposit", 1L, -100d);
+		verify(transactionService).createTransaction(1L, transactRequest);
 	}
 	
 	@Test
 	@DisplayName("Should return Bad Request error for invalid transaction type")
 	public void shouldReturnBadRequestForInvalidTransactionType() throws Exception {
-		when(accountService.createTransaction("xxx", 1L, 100d))
-				.thenThrow(new InvalidTransactionTypeException());
-			
+
 		TransactionRequestDto transactRequest = new TransactionRequestDto();
 		transactRequest.setType("xxx");
 		transactRequest.setAmount(100d);
+
+		when(transactionService.createTransaction(1L, transactRequest))
+				.thenThrow(new InvalidTransactionTypeException());
+
 
 		this.mockMvc.perform(post("/accounts/1/transactions").content(
 		            	objectMapper.writeValueAsString(transactRequest)
 		    		).contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest());
 
-		verify(accountService).createTransaction("xxx", 1L, 100d);
+		verify(transactionService).createTransaction(1L, transactRequest);
 	}
 
 
