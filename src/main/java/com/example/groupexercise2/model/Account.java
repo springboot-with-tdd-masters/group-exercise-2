@@ -121,7 +121,9 @@ public abstract class Account extends AuditModel{
 	}
 
 	public abstract String getType();
-
+	
+	public abstract void initialize(String name);
+	
 	@Override
 	public int hashCode() {
 		return Objects.hash(acctNumber, balance, id, interestCharge, minimumBalance, name, penalty, transactionCharge);

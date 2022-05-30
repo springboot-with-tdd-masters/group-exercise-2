@@ -36,47 +36,22 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public AccountDto createAccount(AccountRequestDto accountRequest) {
+		Account newAccount = null;
 		if (accountRequest.getType().equals("regular")) {
-			Account newAccount = new RegularAccount();
-			newAccount.setName(accountRequest.getName());
-			newAccount.setMinimumBalance(500d);
-			newAccount.setBalance(newAccount.getMinimumBalance());
-			newAccount.setPenalty(10d);
-			newAccount.setTransactionCharge(0d);
-			newAccount.setInterestCharge(0d);
-			newAccount.setAcctNumber(AccountGenerator.generateAccountNumber());
-
-			Account savedAccount = accountRepository.save(newAccount);
-			return new AccountDto(savedAccount);
-
+			newAccount = new RegularAccount();
+			newAccount.initialize(accountRequest.getName());
 		} else if (accountRequest.getType().equals("interest")) {
-			Account newInterestAccount = new InterestAccount();
-			newInterestAccount.setName(accountRequest.getName());
-			newInterestAccount.setMinimumBalance(0d);
-			newInterestAccount.setBalance(newInterestAccount.getMinimumBalance());
-			newInterestAccount.setPenalty(0d);
-			newInterestAccount.setTransactionCharge(0d);
-			newInterestAccount.setInterestCharge(0.03);
-			newInterestAccount.setAcctNumber(AccountGenerator.generateAccountNumber());
-			newInterestAccount.setCreatedDate(LocalDate.now());
-
-			Account savedAccount = accountRepository.save(newInterestAccount);
-			return new AccountDto(savedAccount);
+			newAccount = new InterestAccount();
+			newAccount.initialize(accountRequest.getName());
 		} else if (accountRequest.getType().equals("checking")) {
-			Account newAccount = new CheckingAccount();
-			newAccount.setName(accountRequest.getName());
-			newAccount.setMinimumBalance(100d);
-			newAccount.setBalance(newAccount.getMinimumBalance());
-			newAccount.setPenalty(10d);
-			newAccount.setTransactionCharge(1d);
-			newAccount.setInterestCharge(0d);
-			newAccount.setAcctNumber(AccountGenerator.generateAccountNumber());
-
-			Account savedAccount = accountRepository.save(newAccount);
-			return new AccountDto(savedAccount);
+			newAccount = new CheckingAccount();
+			newAccount.initialize(accountRequest.getName());
 		} else {
 			throw new InvalidAccountTypeException();
 		}
+
+		Account savedAccount = accountRepository.save(newAccount);
+		return new AccountDto(savedAccount);
 	}
 
 	@Override
