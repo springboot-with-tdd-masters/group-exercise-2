@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-public class TransactionLog {
+public class TransactionLog extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
