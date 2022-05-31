@@ -32,6 +32,7 @@ public class InterestTransactionStrategyTest {
         // when
         Account actual = interestTransactionStrategy.generateNewAccountDetails(name, acctNbr);
         // then
+        assertEquals(actual.getAcctNumber(), acctNbr);
         assertEquals(actual.getInterestCharge(), 0.03);
         assertEquals(actual.getMinimumBalance(), 0.0);
     }
