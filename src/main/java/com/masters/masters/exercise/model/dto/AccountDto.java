@@ -9,6 +9,7 @@ package com.masters.masters.exercise.model.dto;
  */
 public class AccountDto {
 
+	private Long id;
 	private String name;
 	
 	private String type;
@@ -40,5 +41,13 @@ public class AccountDto {
 	public void setType(String type) {
 		this.type = type;
 	}
-	
+
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 }

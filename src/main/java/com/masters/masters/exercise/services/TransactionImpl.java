@@ -34,8 +34,8 @@ public class TransactionImpl {
 	@Autowired
 	private TransactionRepository transactionRepository;
 
-	public Page<Transaction> findByAccountId(Long accountId, Pageable pageable) {
-		return transactionRepository.findByAccountId(accountId, pageable);
+	public Page<Transaction> findByAccountId(Account acct, Pageable pageable) {
+		return transactionRepository.findByAccount(acct, pageable);
 	}
 
 	public void deleteTransactionByIdAndAccountId(Long transactionId, Long accountId) throws RecordNotFoundException {

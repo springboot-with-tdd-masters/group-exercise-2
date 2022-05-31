@@ -39,8 +39,9 @@ public class TransactionController {
 	private TransactionImpl transactionService;
 
 	@GetMapping("/{accountId}/transactions")
-	public Page<Transaction> getAllTranscationByAccountId(@PathVariable(value = "accountId") Long accountId, Pageable pageable) {
-		return transactionService.findByAccountId(accountId, pageable);
+	public Page<Transaction> getAllTranscationByAccountId(@PathVariable(value = "accountId") Long accountId, Pageable pageable) throws RecordNotFoundException {
+		Account acct = accountService.getAccountById(accountId);
+		return transactionService.findByAccountId(acct, pageable);
 	}
 
 	@DeleteMapping("/{accountId}/transactions/{transactionId}")
