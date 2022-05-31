@@ -1,6 +1,5 @@
 package com.group3.exercise.bankapp.controllers;
 
-import com.group3.exercise.bankapp.request.TransactionRequest;
 import com.group3.exercise.bankapp.response.TransactionLogResponse;
 import com.group3.exercise.bankapp.services.transaction.TransactionLogService;
 import org.springframework.data.domain.Page;
@@ -21,11 +20,6 @@ public class TransactionLogController {
     @GetMapping
     public Page<TransactionLogResponse> getAll(@PathVariable Long accountId, Pageable pageable) {
         return transactionLogService.findAllByAccountId(accountId, pageable);
-    }
-
-    @PostMapping("/track")
-    public TransactionLogResponse create(@PathVariable Long accountId, @RequestBody TransactionRequest transactionRequest) {
-        return transactionLogService.createLogFor(accountId, transactionRequest);
     }
 
     @DeleteMapping("{id:\\d+}")
