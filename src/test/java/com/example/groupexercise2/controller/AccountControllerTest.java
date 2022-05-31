@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -29,7 +30,6 @@ import com.example.groupexercise2.exeption.AccountNotFoundException;
 import com.example.groupexercise2.exeption.InvalidAccountTypeException;
 import com.example.groupexercise2.exeption.InvalidTransactionAmountException;
 import com.example.groupexercise2.exeption.InvalidTransactionTypeException;
-import com.example.groupexercise2.model.Account;
 import com.example.groupexercise2.model.dto.AccountDto;
 import com.example.groupexercise2.model.dto.AccountRequestDto;
 import com.example.groupexercise2.model.dto.TransactionRequestDto;
@@ -37,8 +37,8 @@ import com.example.groupexercise2.service.AccountService;
 import com.example.groupexercise2.service.TransactionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@WebMvcTest
-@AutoConfigureMockMvc
+@WebMvcTest({AccountController.class, TransactionController.class})
+@AutoConfigureMockMvc(addFilters = false)
 public class AccountControllerTest {
 	 
 	 @Autowired
@@ -50,6 +50,9 @@ public class AccountControllerTest {
 	 @MockBean
 	 private TransactionService transactionService;
 	 
+	 @MockBean
+	 private UserDetailsService userService;
+		
 	 private ObjectMapper objectMapper = new ObjectMapper();
 	 
 	 @Test

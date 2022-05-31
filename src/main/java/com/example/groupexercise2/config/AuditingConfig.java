@@ -1,4 +1,4 @@
-package com.example.groupexercise2;
+package com.example.groupexercise2.config;
 
 import java.util.Optional;
 

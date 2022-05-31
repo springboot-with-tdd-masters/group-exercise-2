@@ -1,7 +1,5 @@
 package com.example.groupexercise2.controller;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -19,20 +17,18 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.example.groupexercise2.model.Account;
-import com.example.groupexercise2.model.RegularAccount;
-import com.example.groupexercise2.model.Transaction;
 import com.example.groupexercise2.model.dto.AccountDto;
 import com.example.groupexercise2.model.dto.TransactionDto;
 import com.example.groupexercise2.service.AccountService;
 import com.example.groupexercise2.service.TransactionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@WebMvcTest
-@AutoConfigureMockMvc
+@WebMvcTest(TransactionController.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class TransactionControllerTest {
 	
 	@Autowired
@@ -43,6 +39,9 @@ public class TransactionControllerTest {
 	
 	@MockBean
 	private TransactionService transactionService;
+	
+	@MockBean
+	private UserDetailsService userService;
 	 
 	private ObjectMapper objectMapper = new ObjectMapper();
 
