@@ -1,7 +1,7 @@
 package com.group3.exercise.bankapp.controllers;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,8 +34,8 @@ public class AccountController {
     }
     
     @GetMapping()
-    public List<AccountResponse> getAllAccounts() {
-    	return service.getAllAccounts();
+    public Page<AccountResponse> getAllAccounts(Pageable page) {
+    	return service.getAllAccounts(page);
     }
     
     @GetMapping("/{id}")

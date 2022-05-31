@@ -2,6 +2,8 @@ package com.group3.exercise.bankapp.response;
 
 public class AccountResponse {
     private Long id;
+    private String createdAt;
+    private String updatedAt;
     private String name;
     private String acctNumber;
     private Double balance;
@@ -73,4 +75,20 @@ public class AccountResponse {
     public void setInterestCharge(Double interestCharge) {
         this.interestCharge = interestCharge;
     }
+
+	public String getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(String createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public String getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(String updatedAt) {
+		this.updatedAt = updatedAt;
+	}
 }

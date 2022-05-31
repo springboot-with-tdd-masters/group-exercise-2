@@ -1,10 +1,11 @@
 package com.group3.exercise.bankapp.services.account;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.group3.exercise.bankapp.adapters.AccountAdapter;
@@ -81,8 +82,8 @@ public class AccountServiceImpl implements AccountService {
         return amount > 0.0;
     }
 	@Override
-	public List<AccountResponse> getAllAccounts() {
-		return accountRepository.findAll().stream().map(accountAdapter::mapToResponse).collect(Collectors.toList());
+	public Page<AccountResponse> getAllAccounts(Pageable page) {
+		return accountRepository.findAll(page).map(accountAdapter::mapToResponse);
 	}
 
 	@Override
