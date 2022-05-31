@@ -1,5 +1,13 @@
 package com.group3.exercise.bankapp.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.group3.exercise.bankapp.exceptions.BankAppException;
+import com.group3.exercise.bankapp.exceptions.BankAppExceptionCode;
+import com.group3.exercise.bankapp.exceptions.GlobalExceptionHandler;
+import com.group3.exercise.bankapp.request.CreateAccountRequest;
+import com.group3.exercise.bankapp.request.TransactionRequest;
+import com.group3.exercise.bankapp.response.AccountResponse;
+import com.group3.exercise.bankapp.services.account.AccountService;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -36,16 +44,17 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.group3.exercise.bankapp.exceptions.BankAppException;
-import com.group3.exercise.bankapp.exceptions.BankAppExceptionCode;
-import com.group3.exercise.bankapp.exceptions.GlobalExceptionHandler;
-import com.group3.exercise.bankapp.request.CreateAccountRequest;
-import com.group3.exercise.bankapp.request.TransactionRequest;
-import com.group3.exercise.bankapp.response.AccountResponse;
-import com.group3.exercise.bankapp.services.account.AccountService;
+import java.util.ArrayList;
+import java.util.List;
 
-@WebMvcTest(controllers = AccountController.class)
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(controllers = AccountController.class, useDefaultFilters = false)
 @ExtendWith(MockitoExtension.class)
 public class AccountControllerTest {
     MockMvc mvc;
@@ -105,7 +114,7 @@ public class AccountControllerTest {
         CreateAccountRequest request = new CreateAccountRequest();
         request.setName("Jane Doe");
         request.setType("credit");
-        when(service.register(any(CreateAccountRequest.class))).thenThrow(new BankAppException(BankAppExceptionCode.BAD_REQUEST));
+        when(service.register(any(CreateAccountRequest.class))).thenThrow(new BankAppException(BankAppExceptionCode.ACCOUNT_TYPE_EXCEPTION));
         // when
         ResultActions result = mvc.perform(post("/accounts")
                 .contentType(MediaType.APPLICATION_JSON)

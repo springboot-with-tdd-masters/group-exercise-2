@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/accounts/{accountId:\\d+}/transactions")
 public class TransactionLogController {
 
-    private TransactionLogService transactionLogService;
+    private final TransactionLogService transactionLogService;
 
     public TransactionLogController(TransactionLogService transactionLogService) {
         this.transactionLogService = transactionLogService;

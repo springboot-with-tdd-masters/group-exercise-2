@@ -3,7 +3,7 @@ package com.group3.exercise.bankapp.exceptions;
 import org.springframework.http.HttpStatus;
 
 public class BankAppException extends RuntimeException {
-    private BankAppExceptionCode code;
+    private final BankAppExceptionCode code;
 
     public BankAppException(BankAppExceptionCode code){
         super(code.getMessage());

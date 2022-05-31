@@ -22,11 +22,11 @@ import java.util.Optional;
 @Service
 public class TransactionLogServiceImpl implements TransactionLogService {
 
-    private TransactionLogRepository transactionLogRepository;
+    private final TransactionLogRepository transactionLogRepository;
 
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
 
-    private TransactionLogAdapter transactionLogAdapter;
+    private final TransactionLogAdapter transactionLogAdapter;
 
     public TransactionLogServiceImpl(
             TransactionLogRepository transactionLogRepository,

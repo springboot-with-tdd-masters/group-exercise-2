@@ -8,7 +8,7 @@ public enum TransactionTypes {
     DEPOSIT("deposit");
     private final String value;
 
-    private TransactionTypes(String value) {
+    TransactionTypes(String value) {
         this.value = value;
     }
 
