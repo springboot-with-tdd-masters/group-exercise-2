@@ -1,6 +1,7 @@
 package com.masters.masters.exercise.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.masters.masters.exercise.config.OAuthHelper;
 import com.masters.masters.exercise.model.Account;
 import com.masters.masters.exercise.model.RegularAccount;
 import com.masters.masters.exercise.model.dto.AccountDto;
@@ -14,9 +15,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,7 +36,15 @@ public class TransactionControllerTest {
     @MockBean
     private AccountServiceImpl accountService;
 
-
+    @MockBean
+	private OAuthHelper	helper;
+    
+    private static final String CLIENT_ID = "devglan-client";
+    
+    private static final String NO_CLIENT_ID = "";
+    
+    private static final String USERNAME = "Zaldy";
+    
     @Test
     @DisplayName("Should be able to deposit to regular account")
     public void shouldeBeAbleToDepositToRegularAccount() throws Exception {
@@ -82,5 +93,18 @@ public class TransactionControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("group 4"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.balance").value("400.0"));
     }
+    
+    @Test
+    public void testRetrieveAccountsWithSecurity() throws Exception {
+ 	   RequestPostProcessor bearerToken = helper.bearerToken(CLIENT_ID, USERNAME);
+ 	   mockMvc.perform(get("/accounts/1/transactions").with(bearerToken))
+ 	   	.andExpect(status().isOk());
+    }
+    
+    @Test
+	public void testHelloWithoutRole() throws Exception {
+		RequestPostProcessor bearerToken = helper.bearerToken(NO_CLIENT_ID, USERNAME);
+		mockMvc.perform(get("/accounts/1/transactions").with(bearerToken)).andExpect(status().isForbidden());
+	}
 
 }

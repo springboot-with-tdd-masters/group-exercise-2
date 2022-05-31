@@ -33,10 +33,12 @@ public class AccountControllerTest {
     @MockBean
     TransactionImpl transactionService;
     
-    @Autowired
+    @MockBean
 	private OAuthHelper	helper;
     
     private static final String CLIENT_ID = "devglan-client";
+    
+    private static final String NO_CLIENT_ID = "";
     
     private static final String USERNAME = "Zaldy";
 
@@ -81,5 +83,11 @@ public class AccountControllerTest {
 	   mockMvc.perform(get("/accounts").with(bearerToken))
 	   	.andExpect(status().isOk());
    }
+   
+   @Test
+	public void testHelloWithoutRole() throws Exception {
+		RequestPostProcessor bearerToken = helper.bearerToken(NO_CLIENT_ID, USERNAME);
+		mockMvc.perform(get("/accounts").with(bearerToken)).andExpect(status().isForbidden());
+	}
 
 }
