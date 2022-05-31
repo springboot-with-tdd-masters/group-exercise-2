@@ -41,7 +41,7 @@ public class CheckingTransactionStrategy implements TransactionStrategy<Checking
 
 	@Override
 	public CheckingAccount withdraw(CheckingAccount account, Double amount) {
-		Double updatedBalance = account.getBalance() - amount;
+		Double updatedBalance = getDefaultValue(account.getBalance()) - amount;
 		updatedBalance = updatedBalance - account.getTransactionCharge();
 		
 		if (updatedBalance < account.getMinimumBalance()) {
@@ -55,7 +55,7 @@ public class CheckingTransactionStrategy implements TransactionStrategy<Checking
 
 	@Override
 	public CheckingAccount deposit(CheckingAccount account, Double amount) {
-		Double updatedBalance = account.getBalance() + amount;
+		Double updatedBalance = getDefaultValue(account.getBalance()) + amount;
 		updatedBalance = updatedBalance - account.getTransactionCharge();
 		
 		if (updatedBalance < account.getMinimumBalance()) {
@@ -67,4 +67,10 @@ public class CheckingTransactionStrategy implements TransactionStrategy<Checking
 		return account;
 	}
 
+	private Double getDefaultValue(Double value) {
+		if (value == null || value.isNaN()) {
+			return 0.0;
+		}
+		return value;
+	}
 }
