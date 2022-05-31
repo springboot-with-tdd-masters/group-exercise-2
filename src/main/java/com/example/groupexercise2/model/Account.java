@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 
+import com.example.groupexercise2.util.AccountGenerator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
@@ -122,7 +123,10 @@ public abstract class Account extends AuditModel{
 
 	public abstract String getType();
 	
-	public abstract void initialize(String name);
+	public void initialize(String name) {
+		setName(name);
+		setAcctNumber(AccountGenerator.generateAccountNumber());	
+	}
 	
 	@Override
 	public int hashCode() {
