@@ -37,6 +37,8 @@ class TransactionLogAdapterTest {
         transactionLog.setAmount(100.0);
         transactionLog.setAccount(account);
         transactionLog.setTransactionDate(now);
+        transactionLog.setCreatedDate(now);
+        transactionLog.setLastModifiedDate(now);
 
         // Act
         final TransactionLogResponse actual = transactionLogAdapter.mapToResponse(transactionLog);
@@ -47,5 +49,7 @@ class TransactionLogAdapterTest {
         assertEquals(100.0, actual.getAmount());
         assertEquals(1L, actual.getAccountId());
         assertEquals(now, actual.getTransactionDate());
+        assertEquals(String.valueOf(now), actual.getCreatedAt());
+        assertEquals(String.valueOf(now), actual.getUpdatedAt());
     }
 }
