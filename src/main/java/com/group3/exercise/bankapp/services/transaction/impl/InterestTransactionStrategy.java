@@ -45,10 +45,4 @@ public class InterestTransactionStrategy implements TransactionStrategy<Interest
         account.setBalance(updated);
         return account;
     }
-    private Double getDefaultValue(Double value){
-        if(value == null || value.isNaN()){
-            return 0.0;
-        }
-        return value;
-    }
 }

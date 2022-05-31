@@ -21,6 +21,9 @@ public enum TransactionTypes {
     }
 
     public static Optional<TransactionTypes> findOptionalByLabel(String value) {
-        return Arrays.stream(TransactionTypes.values()).filter(s -> value.equals(s.value)).findAny();
+        return Arrays
+                .stream(TransactionTypes.values())
+                .filter(s -> value.equals(s.value))
+                .findAny();
     }
 }
