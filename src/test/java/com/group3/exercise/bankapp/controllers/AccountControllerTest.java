@@ -28,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -59,7 +60,10 @@ public class AccountControllerTest {
     @BeforeEach
     void setup() {
         controller = new AccountController(service);
-        mvc = MockMvcBuilders.standaloneSetup(controller).setControllerAdvice(new GlobalExceptionHandler()).build();
+        mvc = MockMvcBuilders
+                .standaloneSetup(controller)
+                .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+                .setControllerAdvice(new GlobalExceptionHandler()).build();
     }
 
     @Test
@@ -278,9 +282,9 @@ public class AccountControllerTest {
     	
 		when(service.getAllAccounts(page)).thenReturn(pageResp);
 
-		mvc.perform(get("/accounts?page=0&size=2").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(get("/accounts?page=0&size=2").contentType(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.size").value(2))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.page").value(0))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.number").value(0))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(2));
 		
 	}
