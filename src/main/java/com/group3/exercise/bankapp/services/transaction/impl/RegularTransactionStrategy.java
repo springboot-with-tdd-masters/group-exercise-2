@@ -58,11 +58,4 @@ public class RegularTransactionStrategy implements TransactionStrategy<RegularAc
 
         return account;
     }
-
-    private Double getDefaultValue(Double value) {
-        if (value == null || value.isNaN()) {
-            return 0.0;
-        }
-        return value;
-    }
 }
