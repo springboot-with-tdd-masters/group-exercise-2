@@ -12,6 +12,8 @@ public class AccountAdapter {
     public AccountResponse mapToResponse(Account account){
         try {
             AccountResponse response = new AccountResponse();
+            response.setCreatedAt(account.getCreatedDate().toString());
+            response.setUpdatedAt(account.getLastModifiedDate().toString());
             response.setBalance(account.getBalance());
             response.setInterestCharge(account.getInterestCharge());
             response.setMinimumBalance(account.getMinimumBalance());
