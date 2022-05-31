@@ -8,6 +8,22 @@ import com.group3.exercise.bankapp.request.CreateAccountRequest;
 import com.group3.exercise.bankapp.request.TransactionRequest;
 import com.group3.exercise.bankapp.response.AccountResponse;
 import com.group3.exercise.bankapp.services.account.AccountService;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,10 +32,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -48,10 +69,10 @@ public class AccountControllerTest {
     @BeforeEach
     void setup() {
         controller = new AccountController(service);
-        mvc = MockMvcBuilders.standaloneSetup(controller)
-                .setControllerAdvice(new GlobalExceptionHandler())
+        mvc = MockMvcBuilders
+                .standaloneSetup(controller)
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
-                .build();
+                .setControllerAdvice(new GlobalExceptionHandler()).build();
     }
 
     @Test
@@ -244,9 +265,7 @@ public class AccountControllerTest {
 	@Test
 	@DisplayName("should retrieve all accounts")
 	public void shouldRetrieveAllAccounts() throws Exception {
-    		
-    	List<AccountResponse> response = new ArrayList<>();
-    	
+		
     	AccountResponse account1 = new AccountResponse();
     	account1.setAcctNumber("123456789");
     	account1.setBalance(100.0);
@@ -267,18 +286,16 @@ public class AccountControllerTest {
     	account2.setPenalty(0.0);
     	account2.setTransactionCharge(0.0);
     	
-    	response.add(account1);
-    	response.add(account2);
-		
-		when(service.getAllAccounts()).thenReturn(response);
+    	Pageable page = PageRequest.of(0, 2);
+    	Page<AccountResponse> pageResp = new PageImpl<>(Arrays.asList(account1, account2));
+    	
+		when(service.getAllAccounts(page)).thenReturn(pageResp);
 
-		mvc.perform(get("/accounts").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value("1"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value("Kobe Bryant"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].acctNumber").value("123456789"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[1].id").value("2"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[1].name").value("Lebron James"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[1].acctNumber").value("987654321"));
+        mvc.perform(get("/accounts?page=0&size=2").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.size").value(2))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.number").value(0))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(2));
+		
 	}
 	
 	@Test

@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -113,79 +112,6 @@ public class TransactionLogControllerTest {
     }
 
     @Test
-    @DisplayName("Should return created transaction log")
-    void create_shouldReturnTransactionLog() throws Exception {
-        // Arrange
-        final Long accountId = 1L;
-
-        final TransactionLogResponse transactionLogResponse = new TransactionLogResponse();
-        transactionLogResponse.setId(1L);
-        transactionLogResponse.setAccountId(accountId);
-        transactionLogResponse.setAmount(100.0);
-        transactionLogResponse.setTransactionType(TransactionTypes.WITHDRAW.value());
-
-        final TransactionRequest transactionRequest = TransactionRequest.of("deposit", 100.0);
-
-        when(transactionLogService.createLogFor(anyLong(), any(TransactionRequest.class)))
-                .thenReturn(transactionLogResponse);
-
-        // Act
-        final ResultActions resultActions = mockMvc.perform(post("/accounts/1/transactions")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(transactionRequest)));
-
-        // Assert
-        verify(transactionLogService)
-                .createLogFor(anyLong(), any(TransactionRequest.class));
-
-        resultActions.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
-        resultActions.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(1)));
-        resultActions.andExpect(MockMvcResultMatchers.jsonPath("$.transactionType", is(TransactionTypes.WITHDRAW.value())));
-        resultActions.andExpect(MockMvcResultMatchers.jsonPath("$.amount", is(100.0)));
-        resultActions.andExpect(MockMvcResultMatchers.jsonPath("$.accountId", is(1)));
-    }
-
-    @Test
-    @DisplayName("Should return 404 if account doesn't exists")
-    void create_shouldReturn404IfAccountDoesntExists() throws Exception {
-        // Arrange
-
-        final TransactionRequest transactionRequest = TransactionRequest.of("deposit", 100.0);
-
-        when(transactionLogService.createLogFor(anyLong(), any(TransactionRequest.class)))
-                .thenThrow(new BankAppException(BankAppExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION));
-
-        // Act
-        final ResultActions resultActions = mockMvc.perform(post("/accounts/1/transactions")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(transactionRequest)));
-
-        // Assert
-        resultActions.andExpect(MockMvcResultMatchers.status().isNotFound());
-        resultActions.andExpect(MockMvcResultMatchers.jsonPath("$.error", is("Unable to process your request. Account does not exists")));
-    }
-
-    @Test
-    @DisplayName("Should return 400 request has invalid transaction type")
-    void create_shouldReturn400IfTransactionTypeIsInvalid() throws Exception {
-        // Arrange
-
-        final TransactionRequest transactionRequest = TransactionRequest.of("invalid transaction", 100.0);
-
-        when(transactionLogService.createLogFor(anyLong(), any(TransactionRequest.class)))
-                .thenThrow(new BankAppException(BankAppExceptionCode.TRANSACTION_TYPE_EXCEPTION));
-
-        // Act
-        final ResultActions resultActions = mockMvc.perform(post("/accounts/1/transactions")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(transactionRequest)));
-
-        // Assert
-        resultActions.andExpect(MockMvcResultMatchers.status().isBadRequest());
-        resultActions.andExpect(MockMvcResultMatchers.jsonPath("$.error", is("Invalid Transaction Type")));
-    }
-
-    @Test
     @DisplayName("Should return 200 and proper message after delete")
     void delete_shouldReturn200() throws Exception {
         // Arrange
@@ -205,10 +131,40 @@ public class TransactionLogControllerTest {
         // Arrange
         doThrow(new BankAppException(BankAppExceptionCode.TRANSACTION_LOG_NOT_FOUND_EXCEPTION))
                 .when(transactionLogService)
-                .delete(anyLong());
+                .deleteTransactionByAccountId(anyLong(), anyLong());
 
         // Act
         final ResultActions resultActions = mockMvc.perform(delete("/accounts/1/transactions/1")
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Assert
+        verify(transactionLogService).deleteTransactionByAccountId(anyLong(),anyLong());
+        resultActions.andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+    @Test
+    @DisplayName("Should return 200 and proper message after delete")
+    void purge_shouldReturn200() throws Exception {
+        // Arrange
+
+        // Act
+        final ResultActions resultActions = mockMvc.perform(delete("/accounts/1/transactions")
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Assert
+        resultActions.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
+        resultActions.andExpect(MockMvcResultMatchers.content().string("Delete Successful"));
+    }
+
+    @Test
+    @DisplayName("Should return 404 if id doesn't exists")
+    void purge_shouldReturn404() throws Exception {
+        // Arrange
+        doThrow(new BankAppException(BankAppExceptionCode.TRANSACTION_LOG_NOT_FOUND_EXCEPTION))
+                .when(transactionLogService)
+                .deleteAllByAccountId(anyLong());
+
+        // Act
+        final ResultActions resultActions = mockMvc.perform(delete("/accounts/1/transactions")
                 .contentType(MediaType.APPLICATION_JSON));
 
         // Assert

@@ -2,10 +2,7 @@ package com.group3.exercise.bankapp.services;
 
 import com.group3.exercise.bankapp.adapters.TransactionLogAdapter;
 import com.group3.exercise.bankapp.constants.TransactionTypes;
-import com.group3.exercise.bankapp.entities.Account;
-import com.group3.exercise.bankapp.entities.InterestAccount;
-import com.group3.exercise.bankapp.entities.RegularAccount;
-import com.group3.exercise.bankapp.entities.TransactionLog;
+import com.group3.exercise.bankapp.entities.*;
 import com.group3.exercise.bankapp.exceptions.BankAppException;
 import com.group3.exercise.bankapp.repository.AccountRepository;
 import com.group3.exercise.bankapp.repository.TransactionLogRepository;
@@ -174,18 +171,22 @@ public class TransactionLogServiceTest {
 
     @Test
     @DisplayName("Should delete transaction log successfully")
-    void delete_shouldDeleteTransaction() {
+    void deleteByTransactionId_shouldDeleteByTransactionId() {
         // Arrange
         Long transactionId = 1L;
+        Long accountId = 1L;
         TransactionLog transactionLog = mock(TransactionLog.class);
 
+        when(accountRepository.findById(1L)).thenReturn(Optional.of(new CheckingAccount()));
         when(transactionLogRepository.findById(transactionId))
                 .thenReturn(Optional.ofNullable(transactionLog));
 
         // Act
-        transactionLogService.delete(transactionId);
+        transactionLogService.deleteTransactionByAccountId(1L, 1L);
 
         // Assert
+        verify(accountRepository, times(1)).findById(1L);
+
         verify(transactionLogRepository)
                 .findById(transactionId);
         verify(transactionLogRepository)
@@ -196,13 +197,52 @@ public class TransactionLogServiceTest {
     @DisplayName("Should throw an error when transaction log id doesn't exists on database")
     void delete_shouldThrowErrorWhenTransactionLogDoesntExists() {
         // Arrange
-
+        when(accountRepository.findById(anyLong())).thenReturn(Optional.of(new CheckingAccount()));
         // Act
-        final Throwable throwable = catchThrowable(() -> transactionLogService.delete(1L));
+        final Throwable throwable = catchThrowable(() -> transactionLogService.deleteTransactionByAccountId(1L, 1L));
 
         // Assert
         assertThat(throwable)
                 .hasMessage("Unable to process your request. Transaction log does not exists")
+                .asInstanceOf(InstanceOfAssertFactories.type(BankAppException.class));
+    }
+    @Test
+    @DisplayName("Should throw an error when accountId provided is not existing")
+    void delete_shouldThrowErrorWhenDeletingTransactionFromNonExistingAccount() {
+        // Arrange
+        when(accountRepository.findById(anyLong())).thenReturn(Optional.empty());
+        // Act
+        final Throwable throwable = catchThrowable(() -> transactionLogService.deleteTransactionByAccountId(1L, 1L));
+
+        // Assert
+        assertThat(throwable)
+                .hasMessage("Unable to process your request. Account does not exists")
+                .asInstanceOf(InstanceOfAssertFactories.type(BankAppException.class));
+    }
+    @Test
+    @DisplayName("Should successfully purge account transactions")
+    void delete_shouldDeleteAllTransactionsForGivenAccount() {
+        // Arrange
+        when(accountRepository.findById(1L)).thenReturn(Optional.of(new CheckingAccount()));
+        // Act
+        final Throwable throwable = catchThrowable(() -> transactionLogService.deleteAllByAccountId(1L));
+
+
+        // Assert
+        verify(transactionLogRepository, times(1)).deleteByAccountId(1L);
+    }
+    @Test
+    @DisplayName("Should throw exception for purging non existing account")
+    void delete_shouldThrowExceptionForPurgingNonExistingAccount() {
+        // Arrange
+        when(accountRepository.findById(1L)).thenReturn(Optional.empty());
+        // Act
+        final Throwable throwable = catchThrowable(() -> transactionLogService.deleteAllByAccountId(1L));
+
+
+        // Assert
+        assertThat(throwable)
+                .hasMessage("Unable to process your request. Account does not exists")
                 .asInstanceOf(InstanceOfAssertFactories.type(BankAppException.class));
     }
 }

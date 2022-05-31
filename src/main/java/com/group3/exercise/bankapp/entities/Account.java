@@ -1,10 +1,16 @@
 package com.group3.exercise.bankapp.entities;
 
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.hibernate.annotations.Type;
-
-import javax.persistence.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -17,7 +23,7 @@ import javax.persistence.*;
 @JsonSubTypes({ @JsonSubTypes.Type(value = RegularAccount.class, name = "regular"),
 		@JsonSubTypes.Type(value = InterestAccount.class, name = "interest"),
 		@JsonSubTypes.Type(value = CheckingAccount.class, name = "checking") })
-public abstract class Account {
+public abstract class Account extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

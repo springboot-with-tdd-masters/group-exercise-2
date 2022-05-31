@@ -6,6 +6,7 @@ import com.group3.exercise.bankapp.exceptions.ErrorMsgWrapper;
 import com.group3.exercise.bankapp.security.jwt.JwtTokenUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Component
+@Profile("jwt")
 public class UserRequestFilter extends OncePerRequestFilter {
 
     @Autowired

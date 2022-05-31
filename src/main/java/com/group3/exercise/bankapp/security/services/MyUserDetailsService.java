@@ -7,6 +7,7 @@ import com.group3.exercise.bankapp.security.entities.UserWrapper;
 import com.group3.exercise.bankapp.security.repositories.UserRepository;
 import com.group3.exercise.bankapp.security.requests.RegisterUserReqDto;
 import com.group3.exercise.bankapp.security.responses.RegisterUserResDto;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

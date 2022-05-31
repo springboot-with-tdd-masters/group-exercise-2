@@ -1,6 +1,5 @@
 package com.group3.exercise.bankapp.controllers;
 
-import com.group3.exercise.bankapp.request.TransactionRequest;
 import com.group3.exercise.bankapp.response.TransactionLogResponse;
 import com.group3.exercise.bankapp.services.transaction.TransactionLogService;
 import org.springframework.data.domain.Page;
@@ -23,18 +22,20 @@ public class TransactionLogController {
         return transactionLogService.findAllByAccountId(accountId, pageable);
     }
 
-    @PostMapping
-    public TransactionLogResponse create(@PathVariable Long accountId, @RequestBody TransactionRequest transactionRequest) {
-        return transactionLogService.createLogFor(accountId, transactionRequest);
-    }
+    @DeleteMapping
+    public ResponseEntity<String> delete(@PathVariable Long accountId) {
 
-    @DeleteMapping("{id:\\d+}")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
-
-        transactionLogService.delete(id);
+        transactionLogService.deleteAllByAccountId(accountId);
 
         return ResponseEntity
                 .ok("Delete Successful");
     }
+    @DeleteMapping("{transactionId:\\d+}")
+    public ResponseEntity<String> deleteByTransactionId(@PathVariable Long accountId, @PathVariable Long transactionId) {
 
+        transactionLogService.deleteTransactionByAccountId(accountId, transactionId);
+
+        return ResponseEntity
+                .ok("Delete Successful");
+    }
 }

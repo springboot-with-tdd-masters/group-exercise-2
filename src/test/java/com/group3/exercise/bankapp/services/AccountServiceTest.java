@@ -10,6 +10,7 @@ import com.group3.exercise.bankapp.response.AccountResponse;
 import com.group3.exercise.bankapp.services.account.AccountService;
 import com.group3.exercise.bankapp.services.account.AccountServiceImpl;
 import com.group3.exercise.bankapp.services.transaction.TransactionStrategyNavigator;
+import com.group3.exercise.bankapp.services.transaction.TransactionWriter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,12 +33,14 @@ public class AccountServiceTest {
     private TransactionStrategyNavigator navigator;
     @Mock
     private AccountAdapter adapter;
+    @Mock
+    private TransactionWriter writer;
 
     private AccountService service;
 
     @BeforeEach
     void setup(){
-        this.service = new AccountServiceImpl(navigator, adapter, repository);
+        this.service = new AccountServiceImpl(navigator, adapter, repository, writer);
     }
 
     @Test
@@ -56,6 +59,7 @@ public class AccountServiceTest {
         when(navigator.withdraw(stubReturn, 100.0)).thenReturn(updated);
         when(repository.save(updated)).thenReturn(updated);
         when(adapter.mapToResponse(updated)).thenReturn(new AccountResponse());
+
         // when
         AccountResponse actual = service.withdraw(1L, request);
         // then
@@ -63,6 +67,7 @@ public class AccountServiceTest {
         verify(navigator, times(1)).withdraw(stubReturn, 100.0);
         verify(repository, times(1)).save(updated);
         verify(adapter, times(1)).mapToResponse(updated);
+        verify(writer, times(1)).writeTransaction(anyLong(), any(TransactionRequest.class));
         assertNotNull(actual);
     }
     @Test
@@ -88,6 +93,7 @@ public class AccountServiceTest {
         verify(navigator, times(1)).deposit(stubReturn, 100.0);
         verify(repository, times(1)).save(updated);
         verify(adapter, times(1)).mapToResponse(updated);
+        verify(writer, times(1)).writeTransaction(anyLong(), any(TransactionRequest.class));
         assertNotNull(actual);
     }
 

@@ -8,5 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface TransactionLogRepository extends JpaRepository<TransactionLog, Long> {
 
     Page<TransactionLog> findByAccountId(Long accountId, Pageable pageRequest);
+    void deleteByAccountId(Long accountId);
 
 }

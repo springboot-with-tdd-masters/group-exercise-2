@@ -15,7 +15,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 public class TransactionLogServiceImpl implements TransactionLogService {
@@ -46,6 +48,7 @@ public class TransactionLogServiceImpl implements TransactionLogService {
     }
 
     @Override
+    @Deprecated
     public TransactionLogResponse createLogFor(Long accountId, TransactionRequest transactionRequest) {
 
         final Account account = accountRepository.findById(accountId)
@@ -59,11 +62,27 @@ public class TransactionLogServiceImpl implements TransactionLogService {
     }
 
     @Override
-    public void delete(Long transactionId) {
-        final TransactionLog transactionLog = transactionLogRepository.findById(transactionId)
-                .orElseThrow(() -> new BankAppException(BankAppExceptionCode.TRANSACTION_LOG_NOT_FOUND_EXCEPTION));
+    @Transactional
+    public void deleteAllByAccountId(Long accountId){
+        // legacy
+        final Optional<Account> found = accountRepository.findById(accountId);
+        if(found.isPresent()) {
+            transactionLogRepository.deleteByAccountId(accountId);
+        } else {
+            throw new BankAppException(BankAppExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION);
+        }
+    }
+    @Override
+    public void deleteTransactionByAccountId(Long accountId, Long transactionId) {
+        final Optional<Account> found = accountRepository.findById(accountId);
+        if(found.isPresent()){
+            final TransactionLog transactionLog = transactionLogRepository.findById(transactionId)
+                    .orElseThrow(() -> new BankAppException(BankAppExceptionCode.TRANSACTION_LOG_NOT_FOUND_EXCEPTION));
 
-        transactionLogRepository.delete(transactionLog);
+            transactionLogRepository.delete(transactionLog);
+        } else {
+            throw new BankAppException(BankAppExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION);
+        }
     }
 
     private TransactionLog createFrom(Account account, TransactionRequest transactionRequest) {

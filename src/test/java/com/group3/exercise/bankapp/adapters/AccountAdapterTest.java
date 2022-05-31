@@ -1,16 +1,19 @@
 package com.group3.exercise.bankapp.adapters;
 
 
-import com.group3.exercise.bankapp.entities.Account;
-import com.group3.exercise.bankapp.entities.InterestAccount;
-import com.group3.exercise.bankapp.exceptions.BankAppException;
-import com.group3.exercise.bankapp.response.AccountResponse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.Date;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import com.group3.exercise.bankapp.entities.Account;
+import com.group3.exercise.bankapp.entities.InterestAccount;
+import com.group3.exercise.bankapp.exceptions.BankAppException;
+import com.group3.exercise.bankapp.response.AccountResponse;
 
 public class AccountAdapterTest {
 
@@ -34,6 +37,8 @@ public class AccountAdapterTest {
         account.setPenalty(0.0);
         account.setAcctNumber("123456789");
         account.setName("JOAN DOE");
+        account.setCreatedDate(new Date());
+        account.setLastModifiedDate(new Date());
         // when
         AccountResponse actual = adapter.mapToResponse(account);
         // then

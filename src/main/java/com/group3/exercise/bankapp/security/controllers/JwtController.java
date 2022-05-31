@@ -9,6 +9,7 @@ import com.group3.exercise.bankapp.security.requests.RegisterUserReqDto;
 import com.group3.exercise.bankapp.security.responses.JwtTokenResponse;
 import com.group3.exercise.bankapp.security.responses.RegisterUserResDto;
 import com.group3.exercise.bankapp.security.services.MyUserDetailsService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @CrossOrigin
 @RequestMapping(path = "/jwt")
+@Profile("jwt")
 public class JwtController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
