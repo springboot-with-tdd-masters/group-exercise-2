@@ -16,6 +16,8 @@ public class TransactionLogAdapter {
         transactionLogResponse.setAmount(transactionLog.getAmount());
         transactionLogResponse.setAccountId(transactionLog.getAccount().getId());
         transactionLogResponse.setTransactionDate(transactionLog.getTransactionDate());
+        transactionLogResponse.setCreatedAt(String.valueOf(transactionLog.getCreatedDate()));
+        transactionLogResponse.setUpdatedAt(String.valueOf(transactionLog.getLastModifiedDate()));
 
         return transactionLogResponse;
     }
