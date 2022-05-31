@@ -4,13 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group3.exercise.bankapp.constants.TransactionTypes;
 import com.group3.exercise.bankapp.exceptions.BankAppException;
 import com.group3.exercise.bankapp.exceptions.BankAppExceptionCode;
-import com.group3.exercise.bankapp.request.TransactionRequest;
 import com.group3.exercise.bankapp.response.TransactionLogResponse;
 import com.group3.exercise.bankapp.services.transaction.TransactionLogService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -116,10 +114,40 @@ public class TransactionLogControllerTest {
         // Arrange
         doThrow(new BankAppException(BankAppExceptionCode.TRANSACTION_LOG_NOT_FOUND_EXCEPTION))
                 .when(transactionLogService)
-                .delete(anyLong());
+                .deleteTransactionByAccountId(anyLong(), anyLong());
 
         // Act
         final ResultActions resultActions = mockMvc.perform(delete("/accounts/1/transactions/1")
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Assert
+        verify(transactionLogService).deleteTransactionByAccountId(anyLong(),anyLong());
+        resultActions.andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+    @Test
+    @DisplayName("Should return 200 and proper message after delete")
+    void purge_shouldReturn200() throws Exception {
+        // Arrange
+
+        // Act
+        final ResultActions resultActions = mockMvc.perform(delete("/accounts/1/transactions")
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Assert
+        resultActions.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
+        resultActions.andExpect(MockMvcResultMatchers.content().string("Delete Successful"));
+    }
+
+    @Test
+    @DisplayName("Should return 404 if id doesn't exists")
+    void purge_shouldReturn404() throws Exception {
+        // Arrange
+        doThrow(new BankAppException(BankAppExceptionCode.TRANSACTION_LOG_NOT_FOUND_EXCEPTION))
+                .when(transactionLogService)
+                .deleteAllByAccountId(anyLong());
+
+        // Act
+        final ResultActions resultActions = mockMvc.perform(delete("/accounts/1/transactions")
                 .contentType(MediaType.APPLICATION_JSON));
 
         // Assert

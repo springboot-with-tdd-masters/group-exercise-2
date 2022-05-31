@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import com.group3.exercise.bankapp.services.transaction.TransactionWriter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,13 +25,16 @@ public class AccountServiceImpl implements AccountService {
     private final TransactionStrategyNavigator transactionStrategyNavigator;
     private final AccountAdapter accountAdapter;
     private final AccountRepository accountRepository;
+    private final TransactionWriter transactionWriter;
     public AccountServiceImpl(
             TransactionStrategyNavigator transactionStrategyNavigator,
             AccountAdapter accountAdapter,
-            AccountRepository repository){
+            AccountRepository repository,
+            TransactionWriter transactionWriter){
         this.accountRepository = repository;
         this.accountAdapter = accountAdapter;
         this.transactionStrategyNavigator = transactionStrategyNavigator;
+        this.transactionWriter = transactionWriter;
     }
 
     @Override
@@ -51,12 +55,14 @@ public class AccountServiceImpl implements AccountService {
         if(!found.isPresent()){
             throw new BankAppException(BankAppExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION);
         }
-        return Optional.of(found)
+        AccountResponse response = Optional.of(found)
                 .map(Optional::get)
                 .map(a -> this.transactionStrategyNavigator.withdraw(a, request.getAmount()))
                 .map(accountRepository::save)
                 .map(accountAdapter::mapToResponse)
                 .orElseThrow(() -> new BankAppException(BankAppExceptionCode.SERVER_TRANSACTION_EXCEPTION));
+        this.transactionWriter.writeTransaction(id, request);
+        return response;
     }
 
     @Override
@@ -68,12 +74,14 @@ public class AccountServiceImpl implements AccountService {
         if(!found.isPresent()){
             throw new BankAppException(BankAppExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION);
         }
-        return Optional.of(found)
+        AccountResponse response = Optional.of(found)
                 .map(Optional::get)
                 .map(a -> this.transactionStrategyNavigator.deposit(a, request.getAmount()))
                 .map(accountRepository::save)
                 .map(accountAdapter::mapToResponse)
                 .orElseThrow(() -> new BankAppException(BankAppExceptionCode.SERVER_TRANSACTION_EXCEPTION));
+        this.transactionWriter.writeTransaction(id, request);
+        return response;
     }
     private String generateAcctNbr(){
         return String.valueOf(new Random().nextInt(99999999));

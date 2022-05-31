@@ -22,13 +22,20 @@ public class TransactionLogController {
         return transactionLogService.findAllByAccountId(accountId, pageable);
     }
 
-    @DeleteMapping("{id:\\d+}")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
+    @DeleteMapping
+    public ResponseEntity<String> delete(@PathVariable Long accountId) {
 
-        transactionLogService.delete(id);
+        transactionLogService.deleteAllByAccountId(accountId);
 
         return ResponseEntity
                 .ok("Delete Successful");
     }
+    @DeleteMapping("{transactionId:\\d+}")
+    public ResponseEntity<String> deleteByTransactionId(@PathVariable Long accountId, @PathVariable Long transactionId) {
 
+        transactionLogService.deleteTransactionByAccountId(accountId, transactionId);
+
+        return ResponseEntity
+                .ok("Delete Successful");
+    }
 }

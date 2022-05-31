@@ -11,5 +11,6 @@ public interface TransactionLogService {
 
     TransactionLogResponse createLogFor(Long accountId, TransactionRequest transactionRequest);
 
-    void delete(Long transactionId);
+    void deleteAllByAccountId(Long accountId);
+    void deleteTransactionByAccountId(Long accountId, Long transactionId);
 }
