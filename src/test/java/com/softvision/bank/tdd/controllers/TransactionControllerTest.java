@@ -1,20 +1,18 @@
 package com.softvision.bank.tdd.controllers;
 
-import static com.softvision.bank.tdd.AccountMocks.*;
-import static com.softvision.bank.tdd.UserMocks.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static com.softvision.bank.tdd.UserMocks.MOCK_USER2_USERNAME;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atMostOnce;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.softvision.bank.tdd.SecurityTestConfig;
-import com.softvision.bank.tdd.model.Account;
-import com.softvision.bank.tdd.model.CheckingAccount;
-import com.softvision.bank.tdd.model.RegularAccount;
-import com.softvision.bank.tdd.services.TransactionService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,20 +20,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
-
-import com.softvision.bank.tdd.AccountMocks;
-import com.softvision.bank.tdd.exceptions.BadRequestException;
-import com.softvision.bank.tdd.model.Transaction;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.softvision.bank.tdd.AccountMocks;
+import com.softvision.bank.tdd.SecurityTestConfig;
+import com.softvision.bank.tdd.exceptions.BadRequestException;
+import com.softvision.bank.tdd.model.Transaction;
+import com.softvision.bank.tdd.services.TransactionService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = SecurityTestConfig.class)
@@ -109,32 +104,6 @@ class TransactionControllerTest {
 		}
 
 		@Test
-		@DisplayName("Should get transactions with pageable sorted by Amount")
-		void test_get_transactions_pageable_sort_by_amount() throws Exception {
-			List<Transaction> transactions = new ArrayList<>();
-			transactions.add(buildTransaction(AccountMocks.getMockRegularAccount(), 100, "DEPOSIT"));
-			transactions.add(buildTransaction(AccountMocks.getMockRegularAccount(), 200, "WITHDRAW"));
-
-			Pageable pageRequest = PageRequest.of(0, 3, Sort.by("amount").descending());
-			List<Transaction> sortedAccounts = transactions.stream().sorted(Comparator.comparing(Transaction::getAmount).reversed()).collect(Collectors.toList());
-			Page<Transaction> accountPage = new PageImpl<>(sortedAccounts);
-			when(transactionService.readTransactions(pageRequest)).thenReturn(accountPage);
-
-			mockMvc.perform(get("/accounts/1/transactions/readByPage")
-							.contentType(MediaType.APPLICATION_JSON)
-							.param("page", "0")
-							.param("size", "3")
-							.param("sort", "amount,desc")
-					)
-					.andExpect(status().isOk())
-					.andExpect(jsonPath("$.content.[0].amount").value(200))
-					.andExpect(jsonPath("$.content.[1].amount").value(100));
-
-			verify(transactionService, atMostOnce()).readTransactions(pageRequest);
-		}
-
-
-		@Test
 		@DisplayName("Should throw BadRequestException")
 		void test_throw_BadRequestException() throws Exception {
 			when(transactionService.transact(anyLong(), any())).thenThrow(BadRequestException.class);
@@ -143,14 +112,6 @@ class TransactionControllerTest {
 
 			verify(transactionService, atMostOnce()).transact(anyLong(), any());
 		}
-	}
-
-	private Transaction buildTransaction(RegularAccount mockRegularAccount, double amount, String type) {
-		Transaction transaction = new Transaction();
-		transaction.setAmount(amount);
-		transaction.setType(type);
-		transaction.setAccount(mockRegularAccount);
-		return transaction;
 	}
 
 	@Test

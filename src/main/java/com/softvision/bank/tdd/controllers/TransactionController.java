@@ -1,12 +1,8 @@
 package com.softvision.bank.tdd.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +26,8 @@ public class TransactionController {
 	TransactionService transactionService;
 
 	@GetMapping
-	public ResponseEntity<List<Transaction>> getAllTransactions(@PathVariable("id") long id) {
-		return new ResponseEntity<List<Transaction>>(transactionService.findbyAccountId(id), new HttpHeaders(),
+	public ResponseEntity<Page<Transaction>> getAllTransactions(Pageable pageable, @PathVariable("id") long id) {
+		return new ResponseEntity<Page<Transaction>>(transactionService.findbyAccountId(pageable, id), new HttpHeaders(),
 				HttpStatus.OK);
 	}
 
@@ -44,11 +40,5 @@ public class TransactionController {
 	public ResponseEntity<Object> deleteById(@PathVariable("id") long accountId, @PathVariable("transaction_id") long transactionId) {
 		transactionService.deleteTransactionById(accountId, transactionId);
 		return ResponseEntity.noContent().build();
-	}
-
-	@GetMapping("/readByPage")
-	private ResponseEntity<Page<Transaction>> readTransactions(@PageableDefault(sort = "id", direction = Sort.Direction.ASC)
-													   Pageable pageable) {
-		return ResponseEntity.ok(transactionService.readTransactions(pageable));
 	}
 }

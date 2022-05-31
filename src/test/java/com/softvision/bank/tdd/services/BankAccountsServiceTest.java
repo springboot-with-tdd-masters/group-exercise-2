@@ -2,16 +2,17 @@ package com.softvision.bank.tdd.services;
 
 import static com.softvision.bank.tdd.AccountMocks.getMockCheckingAccount;
 import static com.softvision.bank.tdd.AccountMocks.getMockRegularAccount;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.softvision.bank.tdd.model.CheckingAccount;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,18 +21,18 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.softvision.bank.tdd.AccountMocks;
 import com.softvision.bank.tdd.exceptions.BadRequestException;
 import com.softvision.bank.tdd.model.Account;
+import com.softvision.bank.tdd.model.CheckingAccount;
 import com.softvision.bank.tdd.model.RegularAccount;
 import com.softvision.bank.tdd.repository.AccountRepository;
-import org.springframework.data.domain.*;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @ExtendWith(MockitoExtension.class)
 public class BankAccountsServiceTest {
@@ -91,9 +92,9 @@ public class BankAccountsServiceTest {
 		Pageable pageRequest = PageRequest.of(0, 3, Sort.by("name").ascending());
 		List<Account> sortedAccounts = accounts.stream().sorted(Comparator.comparing(Account::getName)).collect(Collectors.toList());
 		Page<Account> accountPage = new PageImpl<>(sortedAccounts);
-		when(bankAccountsService.readAccounts(pageRequest)).thenReturn(accountPage);
+		when(bankAccountsService.get(pageRequest)).thenReturn(accountPage);
 
-		Page<Account> retrievedAccountPage = bankAccountsService.readAccounts(pageRequest);
+		Page<Account> retrievedAccountPage = bankAccountsService.get(pageRequest);
 
 		assertAll(() -> assertEquals("Anderson Brooke", retrievedAccountPage.getContent().get(0).getName()),
 				() -> assertEquals(getMockRegularAccount().getName(), retrievedAccountPage.getContent().get(1).getName()));

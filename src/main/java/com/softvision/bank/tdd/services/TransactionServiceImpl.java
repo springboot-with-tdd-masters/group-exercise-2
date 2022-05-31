@@ -1,20 +1,22 @@
 package com.softvision.bank.tdd.services;
 
-import com.softvision.bank.tdd.ApplicationConstants;
-import com.softvision.bank.tdd.exceptions.BadRequestException;
-import com.softvision.bank.tdd.exceptions.InsufficientFundsAvailable;
-import com.softvision.bank.tdd.exceptions.RecordNotFoundException;
-import com.softvision.bank.tdd.model.*;
+import static java.util.Optional.of;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import com.softvision.bank.tdd.ApplicationConstants;
+import com.softvision.bank.tdd.exceptions.BadRequestException;
+import com.softvision.bank.tdd.exceptions.InsufficientFundsAvailable;
+import com.softvision.bank.tdd.exceptions.RecordNotFoundException;
+import com.softvision.bank.tdd.model.Account;
+import com.softvision.bank.tdd.model.CheckingAccount;
+import com.softvision.bank.tdd.model.RegularAccount;
+import com.softvision.bank.tdd.model.Transaction;
 import com.softvision.bank.tdd.repository.AccountRepository;
 import com.softvision.bank.tdd.repository.TransactionRepository;
-
-import static java.util.Optional.of;
-
-import java.util.List;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -79,8 +81,8 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public List<Transaction> findbyAccountId(Long id) {
-		return transactionRepository.findByAccountId(id);
+	public Page<Transaction> findbyAccountId(Pageable pageable, Long id) {
+		return transactionRepository.findByAccountId(pageable, id);
 	}
 
 	@Override
@@ -88,10 +90,5 @@ public class TransactionServiceImpl implements TransactionService {
 		accountRepository.findById(accountId).orElseThrow(RecordNotFoundException::new);
 		transactionRepository.findById(transactionId).orElseThrow(RecordNotFoundException::new);
 		transactionRepository.deleteById(transactionId);
-	}
-
-	@Override
-	public Page<Transaction> readTransactions(Pageable pageable) {
-		return transactionRepository.findAll(pageable);
 	}
 }

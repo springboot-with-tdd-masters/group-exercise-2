@@ -1,12 +1,31 @@
 package com.softvision.bank.tdd.controllers;
 
+import static com.softvision.bank.tdd.AccountMocks.CHK_MOCK_ACCT_ID;
+import static com.softvision.bank.tdd.AccountMocks.CHK_MOCK_ACCT_NO;
+import static com.softvision.bank.tdd.AccountMocks.CHK_MOCK_BALANCE;
+import static com.softvision.bank.tdd.AccountMocks.CHK_MOCK_INTEREST;
+import static com.softvision.bank.tdd.AccountMocks.INT_MOCK_ACCT_ID;
+import static com.softvision.bank.tdd.AccountMocks.INT_MOCK_ACCT_NO;
+import static com.softvision.bank.tdd.AccountMocks.INT_MOCK_BALANCE;
+import static com.softvision.bank.tdd.AccountMocks.MOCK_NAME;
+import static com.softvision.bank.tdd.AccountMocks.REG_MOCK_ACCT_ID;
+import static com.softvision.bank.tdd.AccountMocks.REG_MOCK_ACCT_NO;
+import static com.softvision.bank.tdd.AccountMocks.REG_MOCK_BALANCE;
+import static com.softvision.bank.tdd.AccountMocks.REG_MOCK_INTEREST;
+import static com.softvision.bank.tdd.AccountMocks.REG_MOCK_TRANSACTION;
+import static com.softvision.bank.tdd.AccountMocks.getMockCheckingAccount;
+import static com.softvision.bank.tdd.AccountMocks.getMockInterestAccount;
+import static com.softvision.bank.tdd.AccountMocks.getMockRegularAccount;
 import static com.softvision.bank.tdd.UserMocks.MOCK_USER1_USERNAME;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.atMostOnce;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -15,13 +34,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.softvision.bank.tdd.ApplicationConstants;
-import com.softvision.bank.tdd.SecurityTestConfig;
-import com.softvision.bank.tdd.model.CheckingAccount;
-import com.softvision.bank.tdd.model.InterestAccount;
-import com.softvision.bank.tdd.model.RegularAccount;
-import com.softvision.bank.tdd.services.BankAccountsService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -29,18 +41,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.softvision.bank.tdd.ApplicationConstants;
+import com.softvision.bank.tdd.SecurityTestConfig;
 import com.softvision.bank.tdd.exceptions.BadRequestException;
 import com.softvision.bank.tdd.exceptions.RecordNotFoundException;
 import com.softvision.bank.tdd.model.Account;
-
-import static com.softvision.bank.tdd.AccountMocks.*;
+import com.softvision.bank.tdd.model.CheckingAccount;
+import com.softvision.bank.tdd.model.InterestAccount;
+import com.softvision.bank.tdd.model.RegularAccount;
+import com.softvision.bank.tdd.services.BankAccountsService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = SecurityTestConfig.class)
@@ -124,37 +144,6 @@ class BankAccountsControllerTest {
 	@WithUserDetails(MOCK_USER1_USERNAME)
 	class GetAccountsTests {
 		@Test
-		@DisplayName("Should get all accounts")
-		void test_get_all_accounts() throws Exception {
-
-			List<Account> accounts = new ArrayList<>();
-			accounts.add(getMockRegularAccount());
-			accounts.add(getMockCheckingAccount());
-
-			when(bankAccountsService.get()).thenReturn(accounts);
-
-			mockMvc.perform(get("/accounts").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-					.andExpect(jsonPath("$[0].type").value("regular"))
-					.andExpect(jsonPath("$[0].name").value(MOCK_NAME))
-					.andExpect(jsonPath("$[0].acctNumber").value(REG_MOCK_ACCT_NO))
-					.andExpect(jsonPath("$[0].balance").value(REG_MOCK_BALANCE))
-					.andExpect(jsonPath("$[0].minimumBalance").value(ApplicationConstants.REG_MIN_BALANCE))
-					.andExpect(jsonPath("$[0].penalty").value(ApplicationConstants.REG_PENALTY))
-					.andExpect(jsonPath("$[0].transactionCharge").value(REG_MOCK_TRANSACTION))
-					.andExpect(jsonPath("$[0].interestCharge").value(REG_MOCK_INTEREST))
-					.andExpect(jsonPath("$[1].type").value("checking"))
-					.andExpect(jsonPath("$[1].name").value(MOCK_NAME))
-					.andExpect(jsonPath("$[1].acctNumber").value(CHK_MOCK_ACCT_NO))
-					.andExpect(jsonPath("$[1].balance").value(CHK_MOCK_BALANCE))
-					.andExpect(jsonPath("$[1].minimumBalance").value(ApplicationConstants.CHK_MIN_BALANCE))
-					.andExpect(jsonPath("$[1].penalty").value(ApplicationConstants.CHK_PENALTY))
-					.andExpect(jsonPath("$[1].transactionCharge").value(ApplicationConstants.CHK_CHARGE))
-					.andExpect(jsonPath("$[1].interestCharge").value(CHK_MOCK_INTEREST));
-
-			verify(bankAccountsService, atMostOnce()).get();
-		}
-
-		@Test
 		@DisplayName("Should get accounts with pageable sorted by Name")
 		void test_get_accounts_pageable_sort_by_name() throws Exception {
 			List<Account> accounts = new ArrayList<>();
@@ -166,9 +155,9 @@ class BankAccountsControllerTest {
 			Pageable pageRequest = PageRequest.of(0, 3, Sort.by("name").ascending());
 			List<Account> sortedAccounts = accounts.stream().sorted(Comparator.comparing(Account::getName)).collect(Collectors.toList());
 			Page<Account> accountPage = new PageImpl<>(sortedAccounts);
-			when(bankAccountsService.readAccounts(pageRequest)).thenReturn(accountPage);
+			when(bankAccountsService.get(pageRequest)).thenReturn(accountPage);
 
-			mockMvc.perform(get("/accounts/readByPage")
+			mockMvc.perform(get("/accounts")
 							.contentType(MediaType.APPLICATION_JSON)
 							.param("page", "0")
 							.param("size", "3")
@@ -178,19 +167,25 @@ class BankAccountsControllerTest {
 					.andExpect(jsonPath("$.content.[0].name").value("Anderson Brooke"))
 					.andExpect(jsonPath("$.content.[1].name").value(MOCK_NAME));
 
-			verify(bankAccountsService, atMostOnce()).get();
+			verify(bankAccountsService, atMostOnce()).get(pageRequest);
 		}
 
 		@Test
 		@DisplayName("Should return empty list when no record found")
 		void test_get_all_accounts_empty_list() throws Exception {
-			when(bankAccountsService.get()).thenReturn(new ArrayList<>());
+			Pageable pageRequest = PageRequest.of(0, 3, Sort.by("name").ascending());
+			when(bankAccountsService.get(pageRequest)).thenReturn(new PageImpl<>(new ArrayList<>()));
 
-			MvcResult mvcResult = mockMvc.perform(get("/accounts").contentType(MediaType.APPLICATION_JSON))
-					.andExpect(status().isOk()).andReturn();
+			mockMvc.perform(get("/accounts").contentType(MediaType.APPLICATION_JSON)
+							.contentType(MediaType.APPLICATION_JSON)
+							.param("page", "0")
+							.param("size", "3")
+							.param("sort", "name,asc")
+					).andDo(print())
+					.andExpect(status().isOk())
+					.andExpect(jsonPath("$.content").isEmpty());
 
-			assertThat("[]").isEqualTo(mvcResult.getResponse().getContentAsString());
-			verify(bankAccountsService, atMostOnce()).get();
+			verify(bankAccountsService, atMostOnce()).get(pageRequest);
 		}
 	}
 

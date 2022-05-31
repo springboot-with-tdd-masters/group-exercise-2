@@ -6,7 +6,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class UserExistsException extends ForbiddenException {
 
-    public UserExistsException() {
+	private static final long serialVersionUID = 7469339035876899219L;
+
+	public UserExistsException() {
         super("User already exists.");
     }
     public UserExistsException(String message) {

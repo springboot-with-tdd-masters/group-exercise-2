@@ -1,35 +1,52 @@
 package com.softvision.bank.tdd.services;
 
-import com.softvision.bank.tdd.AccountMocks;
-import com.softvision.bank.tdd.ApplicationConstants;
-import com.softvision.bank.tdd.exceptions.BadRequestException;
-import com.softvision.bank.tdd.exceptions.RecordNotFoundException;
-import com.softvision.bank.tdd.model.Account;
-import com.softvision.bank.tdd.model.CheckingAccount;
-import com.softvision.bank.tdd.model.RegularAccount;
-import com.softvision.bank.tdd.model.Transaction;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
-import com.softvision.bank.tdd.repository.AccountRepository;
-import com.softvision.bank.tdd.repository.TransactionRepository;
-import org.springframework.data.domain.*;
-import org.springframework.http.MediaType;
+import static com.softvision.bank.tdd.AccountMocks.CHK_MOCK_ACCT_ID;
+import static com.softvision.bank.tdd.AccountMocks.CHK_MOCK_BALANCE;
+import static com.softvision.bank.tdd.AccountMocks.REG_MOCK_ACCT_ID;
+import static com.softvision.bank.tdd.AccountMocks.REG_MOCK_BALANCE;
+import static com.softvision.bank.tdd.AccountMocks.getMockCheckingAccount;
+import static com.softvision.bank.tdd.AccountMocks.getMockRegularAccount;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.atMostOnce;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.softvision.bank.tdd.AccountMocks.*;
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static java.util.Optional.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
+import com.softvision.bank.tdd.AccountMocks;
+import com.softvision.bank.tdd.ApplicationConstants;
+import com.softvision.bank.tdd.exceptions.BadRequestException;
+import com.softvision.bank.tdd.exceptions.RecordNotFoundException;
+import com.softvision.bank.tdd.model.Account;
+import com.softvision.bank.tdd.model.RegularAccount;
+import com.softvision.bank.tdd.model.Transaction;
+import com.softvision.bank.tdd.repository.AccountRepository;
+import com.softvision.bank.tdd.repository.TransactionRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class TransactionServiceTests {
@@ -222,9 +239,9 @@ public class TransactionServiceTests {
         Pageable pageRequest = PageRequest.of(0, 3, Sort.by("amount").descending());
         List<Transaction> sortedAccounts = transactions.stream().sorted(Comparator.comparing(Transaction::getAmount).reversed()).collect(Collectors.toList());
         Page<Transaction> accountPage = new PageImpl<>(sortedAccounts);
-        when(transactionService.readTransactions(pageRequest)).thenReturn(accountPage);
+        when(transactionService.findbyAccountId(pageRequest, 1L)).thenReturn(accountPage);
 
-        Page<Transaction> retrievedTransactionPage = transactionService.readTransactions(pageRequest);
+        Page<Transaction> retrievedTransactionPage = transactionService.findbyAccountId(pageRequest, 1L);
 
          assertAll(() -> assertEquals(200, retrievedTransactionPage.getContent().get(0).getAmount()),
                 () -> assertEquals(100, retrievedTransactionPage.getContent().get(1).getAmount()));

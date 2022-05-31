@@ -11,7 +11,8 @@ import java.util.List;
 
 public class UserDetailsAdapter implements UserDetails {
 
-    private final User user;
+	private static final long serialVersionUID = 936637481824083113L;
+	private final User user;
 
     public UserDetailsAdapter(User user) {
         this.user = user;
