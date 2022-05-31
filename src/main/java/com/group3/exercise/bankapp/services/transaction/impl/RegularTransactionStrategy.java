@@ -36,7 +36,7 @@ public class RegularTransactionStrategy implements TransactionStrategy<RegularAc
     @Override
     public RegularAccount withdraw(RegularAccount account, Double amount) {
 
-        final Double currentBalance = account.getBalance();
+        final Double currentBalance = getDefaultValue(account.getBalance());
 
         Double newBalance = currentBalance - amount;
 
@@ -52,10 +52,17 @@ public class RegularTransactionStrategy implements TransactionStrategy<RegularAc
     @Override
     public RegularAccount deposit(RegularAccount account, Double amount) {
 
-        final Double currentBalance = account.getBalance();
+        final Double currentBalance = getDefaultValue(account.getBalance());
 
         account.setBalance(currentBalance + amount);
 
         return account;
+    }
+
+    private Double getDefaultValue(Double value) {
+        if (value == null || value.isNaN()) {
+            return 0.0;
+        }
+        return value;
     }
 }
