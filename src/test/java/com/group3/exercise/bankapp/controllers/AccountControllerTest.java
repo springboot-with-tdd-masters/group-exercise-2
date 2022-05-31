@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -273,7 +274,7 @@ public class AccountControllerTest {
     	account2.setTransactionCharge(0.0);
     	
     	Pageable page = PageRequest.of(0, 2);
-    	Page<AccountResponse> pageResp = new PageImpl<>(List.of(account1, account2));
+    	Page<AccountResponse> pageResp = new PageImpl<>(Arrays.asList(account1, account2));
     	
 		when(service.getAllAccounts(page)).thenReturn(pageResp);
 
