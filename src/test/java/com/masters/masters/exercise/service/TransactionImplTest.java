@@ -1,10 +1,9 @@
 package com.masters.masters.exercise.service;
 
 import com.masters.masters.exercise.exception.AmountExceededException;
-import com.masters.masters.exercise.model.Account;
-import com.masters.masters.exercise.model.CheckingAccount;
-import com.masters.masters.exercise.model.InterestAccount;
+import com.masters.masters.exercise.model.*;
 import com.masters.masters.exercise.repository.AccountRepository;
+import com.masters.masters.exercise.repository.TransactionRepository;
 import com.masters.masters.exercise.services.TransactionImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +12,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -22,10 +25,15 @@ import static org.mockito.Mockito.when;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
+
 public class TransactionImplTest {
 
     @Mock
     AccountRepository repo;
+
+    @Mock
+    TransactionRepository transactionRepository;
 
     @InjectMocks
     TransactionImpl service;
@@ -119,5 +127,23 @@ public class TransactionImplTest {
         });
         assertEquals("Insufficient Funds",exception.getMessage());
     }
+
+    @Test
+    public void findByAccountId(){
+        Transaction txn1 = new Transaction();
+        Transaction txn2 = new Transaction();
+        txn1.setAccount(new CheckingAccount());
+        txn1.setAmount(10.0);
+        txn1.setType(TransactionType.WITHDRAW);
+        txn2.setAccount(new CheckingAccount());
+        txn2.setAmount(10.0);
+        txn2.setType(TransactionType.WITHDRAW);
+        when(transactionRepository.findByAccount(Mockito.any(Account.class),Mockito.any()))
+                .thenReturn(new PageImpl<>(List.of(txn1,txn2)));
+        Pageable pageable = PageRequest.of(0,20);
+        Page<Transaction> txnPage = service.findByAccountId(new CheckingAccount(),pageable);
+        Assertions.assertEquals(2,txnPage.getContent().size());
+    }
+
 
 }
