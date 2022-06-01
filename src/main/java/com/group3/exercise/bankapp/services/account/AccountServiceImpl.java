@@ -96,7 +96,10 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public AccountResponse getAccountById(Long id) {
-		return Optional.of(id).map(accountRepository::findById).map(Optional::get).map(accountAdapter::mapToResponse)
+		return Optional.of(id).map(accountRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(accountAdapter::mapToResponse)
 				.orElseThrow(() -> new BankAppException(BankAppExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION));
 	}
 

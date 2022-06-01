@@ -22,6 +22,7 @@ public class InterestTransactionStrategy implements TransactionStrategy<Interest
     public InterestAccount generateNewAccountDetails(String name, String acctNumber) {
         // TODO generate Account entity here.
         InterestAccount account = new InterestAccount();
+        account.setName(name);
         account.setAcctNumber(acctNumber);
         account.setInterestCharge(interest);
         account.setMinimumBalance(minimumBalance);

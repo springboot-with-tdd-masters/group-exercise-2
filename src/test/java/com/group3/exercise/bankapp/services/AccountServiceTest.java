@@ -126,6 +126,16 @@ public class AccountServiceTest {
         assertEquals("Unable to map response", actual.getMessage());
     }
     @Test
+    @DisplayName("should throw correct exception if account not found")
+    void shouldThrowBankExceptionWhenAccountNotFound(){
+        // given
+        when(repository.findById(1L)).thenReturn(Optional.empty());
+        // when
+        BankAppException exception = assertThrows(BankAppException.class, () -> service.getAccountById(1L));
+        assertEquals(BankAppExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION.getMessage(), exception.getMessage());
+    }
+
+    @Test
     @DisplayName("should throw correct exception if invalid amount on withdraw")
     void shouldThrowCorrectExceptionIfWithdrawAndInvalidAmount() {
         TransactionRequest request = new TransactionRequest();

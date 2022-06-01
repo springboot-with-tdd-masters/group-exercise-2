@@ -27,11 +27,12 @@ public class InterestTransactionStrategyTest {
     @DisplayName("Should generate correct details Interest Account")
     void shouldGenerateCorrectAccountDetails(){
         // given
-        String name = "MARIO A";
+        String name = "ANNO DOMINI";
         String acctNbr = "12343555";
         // when
         Account actual = interestTransactionStrategy.generateNewAccountDetails(name, acctNbr);
         // then
+        assertEquals("ANNO DOMINI", actual.getName());
         assertEquals(actual.getAcctNumber(), acctNbr);
         assertEquals(actual.getInterestCharge(), 0.03);
         assertEquals(actual.getMinimumBalance(), 0.0);
