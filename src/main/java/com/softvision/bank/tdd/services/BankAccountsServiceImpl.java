@@ -49,18 +49,6 @@ public class BankAccountsServiceImpl implements BankAccountsService {
 			return repository.save(newAccount);
 		} else {
 			accountEntity.setAcctNumber(generateRandomAcctNum());
-			if (accountEntity instanceof RegularAccount) {
-				accountEntity.setPenalty(ApplicationConstants.REG_PENALTY);
-				accountEntity.setMinimumBalance(ApplicationConstants.REG_MIN_BALANCE);
-				accountEntity.setBalance(ApplicationConstants.REG_MIN_BALANCE);
-			} else if (accountEntity instanceof CheckingAccount) {
-				accountEntity.setMinimumBalance(ApplicationConstants.CHK_MIN_BALANCE);
-				accountEntity.setTransactionCharge(ApplicationConstants.CHK_CHARGE);
-				accountEntity.setPenalty(ApplicationConstants.CHK_PENALTY);
-				accountEntity.setBalance(ApplicationConstants.CHK_MIN_BALANCE);
-			} else if (accountEntity instanceof InterestAccount) {
-				accountEntity.setInterestCharge(ApplicationConstants.INT_INTEREST);
-			}
 		}
 		
 		return repository.save(accountEntity);
