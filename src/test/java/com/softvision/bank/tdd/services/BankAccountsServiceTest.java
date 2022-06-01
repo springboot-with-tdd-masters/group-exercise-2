@@ -1,0 +1,127 @@
+package com.softvision.bank.tdd.services;
+
+import static com.softvision.bank.tdd.AccountMocks.getMockCheckingAccount;
+import static com.softvision.bank.tdd.AccountMocks.getMockRegularAccount;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
+import com.softvision.bank.tdd.AccountMocks;
+import com.softvision.bank.tdd.exceptions.BadRequestException;
+import com.softvision.bank.tdd.model.Account;
+import com.softvision.bank.tdd.model.CheckingAccount;
+import com.softvision.bank.tdd.model.RegularAccount;
+import com.softvision.bank.tdd.repository.AccountRepository;
+
+@ExtendWith(MockitoExtension.class)
+public class BankAccountsServiceTest {
+
+	@Mock
+	AccountRepository accountRepository;
+	
+	@InjectMocks
+	private BankAccountsService bankAccountsService = new BankAccountsServiceImpl();
+	
+	@Captor
+	ArgumentCaptor<Account> saveAccountCaptor;
+	
+	@Test
+	@DisplayName("Should Create Regular Account")
+	void test_create_regular_account() {
+		Account regularAccount = AccountMocks.getMockRegularAccount();
+		regularAccount.setBalance(500.00);
+		
+		when(accountRepository.save(saveAccountCaptor.capture())).thenReturn(regularAccount);
+		
+		Account accountActual = bankAccountsService.createUpdate(regularAccount);
+		
+		assertAll(() -> assertEquals(saveAccountCaptor.getValue().getBalance(), accountActual.getBalance()),
+				() -> assertEquals(saveAccountCaptor.getValue().getInterestCharge(), accountActual.getInterestCharge()),
+				() -> assertEquals(saveAccountCaptor.getValue().getMinimumBalance(), accountActual.getMinimumBalance()),
+				() -> assertEquals(saveAccountCaptor.getValue().getPenalty(), accountActual.getPenalty()),
+				() -> assertEquals(saveAccountCaptor.getValue().getTransactionCharge(), accountActual.getTransactionCharge()));
+	}
+	
+	@Test
+	@DisplayName("Should Create Checking Account")
+	void test_create_checking_account() {
+		Account checkingAccount = AccountMocks.getMockCheckingAccount();
+		checkingAccount.setBalance(100.00);
+		
+		when(accountRepository.save(saveAccountCaptor.capture())).thenReturn(checkingAccount);
+		
+		Account accountActual = bankAccountsService.createUpdate(checkingAccount);
+		
+		assertAll(() -> assertEquals(saveAccountCaptor.getValue().getBalance(), accountActual.getBalance()),
+				() -> assertEquals(saveAccountCaptor.getValue().getInterestCharge(), accountActual.getInterestCharge()),
+				() -> assertEquals(saveAccountCaptor.getValue().getMinimumBalance(), accountActual.getMinimumBalance()),
+				() -> assertEquals(saveAccountCaptor.getValue().getPenalty(), accountActual.getPenalty()),
+				() -> assertEquals(saveAccountCaptor.getValue().getTransactionCharge(), accountActual.getTransactionCharge()));
+	}
+
+	@Test
+	@DisplayName("Should get accounts with pageable sorted by Name")
+	void test_get_account_sorted_by_name() {
+		List<Account> accounts = new ArrayList<>();
+		accounts.add(getMockRegularAccount());
+		CheckingAccount mockCheckingAccount = getMockCheckingAccount();
+		mockCheckingAccount.setName("Anderson Brooke");
+		accounts.add(mockCheckingAccount);
+
+		Pageable pageRequest = PageRequest.of(0, 3, Sort.by("name").ascending());
+		List<Account> sortedAccounts = accounts.stream().sorted(Comparator.comparing(Account::getName)).collect(Collectors.toList());
+		Page<Account> accountPage = new PageImpl<>(sortedAccounts);
+		when(bankAccountsService.get(pageRequest)).thenReturn(accountPage);
+
+		Page<Account> retrievedAccountPage = bankAccountsService.get(pageRequest);
+
+		assertAll(() -> assertEquals("Anderson Brooke", retrievedAccountPage.getContent().get(0).getName()),
+				() -> assertEquals(getMockRegularAccount().getName(), retrievedAccountPage.getContent().get(1).getName()));
+	}
+	
+	@Test
+	@DisplayName("Should Create Interest Account")
+	void test_create_interest_account() {
+		Account interestAccount = AccountMocks.getMockInterestAccount();
+		interestAccount.setBalance(0.00);
+		
+		when(accountRepository.save(saveAccountCaptor.capture())).thenReturn(interestAccount);
+		
+		Account accountActual = bankAccountsService.createUpdate(interestAccount);
+		
+		assertAll(() -> assertEquals(saveAccountCaptor.getValue().getBalance(), accountActual.getBalance()),
+				() -> assertEquals(saveAccountCaptor.getValue().getInterestCharge(), accountActual.getInterestCharge()),
+				() -> assertEquals(saveAccountCaptor.getValue().getMinimumBalance(), accountActual.getMinimumBalance()),
+				() -> assertEquals(saveAccountCaptor.getValue().getPenalty(), accountActual.getPenalty()),
+				() -> assertEquals(saveAccountCaptor.getValue().getTransactionCharge(), accountActual.getTransactionCharge()));
+	}
+	
+	@Test
+	@DisplayName("Should Throw BadRequestException")
+	void test_throw_BadRequestException() {
+		when(accountRepository.save(any())).thenThrow(BadRequestException.class);
+		assertThrows(BadRequestException.class, ()-> bankAccountsService.createUpdate(new RegularAccount()));
+		
+	}
+}
